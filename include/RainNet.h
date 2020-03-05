@@ -6,4 +6,6 @@
 #include "../src/layer.h"
 #include "../src/net.h"
 
+#include <iostream>
+
 #endif
