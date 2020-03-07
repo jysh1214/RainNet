@@ -18,6 +18,9 @@ int main()
     network.predict(input);
 
     std::cout << (layer_0->next)->getType() << std::endl;
+    std::cout << (layer_1->prev)->getSize() << std::endl;
+    layer_1->printWieght();
+    layer_1->printOutput();
     network.free();
 
     return 0;

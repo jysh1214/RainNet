@@ -16,7 +16,18 @@ ConnectedLayer::~ConnectedLayer()
 
 void ConnectedLayer::forward()
 {
-    std::cout << "fuck" << std::endl;
+    float* t_output;
+
+    if (this->prev){
+        t_output =
+        matrixMultiplication((this->prev)->getOutput(), this->wieght, 1, (this->prev)->getSize(), this->size);
+    }
+    
+    if (t_output) this->output = t_output;
+
+    if (!this->next){
+        // count error
+    }
 }
 
 void ConnectedLayer::backward()
@@ -70,6 +81,24 @@ float* ConnectedLayer::getWieght()
     return this->wieght;
 }
 
+void ConnectedLayer::printWieght()
+{
+    size_t row = (this->prev)->getSize();
+    size_t col = this->size;
+
+    if (this->wieght){
+        for (size_t i=0; i<row; ++i){
+            std::cout << "[";
+            for (size_t j=0; j<col; ++j){
+                printf("%6f", this->wieght[j + this->size*i]);
+                if (j != col-1) std::cout << " ,";
+            }
+            std::cout << "]";
+            std::cout << std::endl;
+        }
+    }
+}
+
 void ConnectedLayer::setOutput(float* output)
 {
     this->output = output;
@@ -78,4 +107,22 @@ void ConnectedLayer::setOutput(float* output)
 float* ConnectedLayer::getOutput()
 {
     return this->output;
+}
+
+void ConnectedLayer::printOutput()
+{
+    size_t row = 1;
+    size_t col = this->size;
+
+    if (this->output){
+        for (size_t i=0; i<row; ++i){
+            std::cout << "[";
+            for (size_t j=0; j<col; ++j){
+                printf("%6f", this->output[j + this->size*i]);
+                if (j != col-1) std::cout << " ,";
+            }
+            std::cout << "]";
+            std::cout << std::endl;
+        }
+    }
 }

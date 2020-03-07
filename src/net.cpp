@@ -41,7 +41,6 @@ void Net::initRandomWieght()
         float* wieght = (float*) new float[a*b];
         for (size_t j=0; j<a*b; ++j){
             wieght[j] = (float(rand()%200)/100) - 1;
-            std::cout << wieght[j] << std::endl;
         }
         (this->layers[i])->setWieght(wieght);
     }
@@ -54,6 +53,7 @@ void Net::init()
         this->initRandomWieght();
     }
 
+    // first layer
     (this->layers[0])->setInput(this->input);
     (this->layers[0])->setOutput(this->input);
 }
@@ -62,6 +62,7 @@ void Net::predict(float* input)
 {
     this->input = input;
     this->init();
+    if ((this->layers[1])->prev) ;
     (this->layers[1])->forward();
 }
 

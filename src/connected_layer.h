@@ -3,6 +3,7 @@
 
 #include "layer.h"
 #include "activation_fumction.h"
+#include "matrix_operator.h"
 
 #include <iostream>
 
@@ -11,9 +12,6 @@ struct ConnectedLayer: public Layer
 public:
     ConnectedLayer(size_t size, std::string activation);
     virtual ~ConnectedLayer();
-
-    struct Layer* next;
-    struct Layer* prev;
 
     void forward();
     void backward();
@@ -28,8 +26,10 @@ public:
     float* getInput();
     void setWieght(float* wieght);
     float* getWieght();
+    void printWieght();
     void setOutput(float* output);
     float* getOutput();
+    void printOutput();
 
 private:
     float(*ActivationFunction)(float);
