@@ -9,7 +9,7 @@ struct Layer
     Layer* next;
     Layer* prev;
 
-    virtual void forward() = 0;
+    virtual void forward(bool training) = 0;
     virtual void backward() = 0;
     virtual void update() = 0;
 
@@ -26,6 +26,8 @@ struct Layer
     virtual void setOutput(float* output) = 0;
     virtual float* getOutput() = 0;
     virtual void printOutput() = 0;
+
+    virtual void setTarget(float* target) = 0;
 };
 
 #endif

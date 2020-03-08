@@ -2,7 +2,7 @@
 #define MATRIX_OPERATOR_H
 
 #include <stdlib.h>
-#include <iostream>
+
 /**
  * matrixMultiplication - matrix a * matrix b
  * 

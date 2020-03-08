@@ -14,19 +14,38 @@ ConnectedLayer::~ConnectedLayer()
     if (output) delete [] output;
 }
 
-void ConnectedLayer::forward()
+void ConnectedLayer::forward(bool training)
 {
     float* t_output;
-
     if (this->prev){
         t_output =
         matrixMultiplication((this->prev)->getOutput(), this->wieght, 1, (this->prev)->getSize(), this->size);
     }
     
     if (t_output) this->output = t_output;
+    if (ActivationFunction){
+        for (size_t i=0; i<this->size; ++i){
+            this->output[i] = ActivationFunction(this->output[i]);
+        }
+    }
 
+    std::cout << this->index << std::endl;
+    this->printOutput();
+
+    if (this->next) (this->next)->forward(training);
     if (!this->next){
-        // count error
+        if (training){
+            assert(this->target && "\nLayer::forward ERROR: The target is missing.\n");
+            // count error
+            float error = (target[0] - this->output[0])*(1 - this->output[0])*this->output[0];
+            std::cout << "error: " << error << std::endl;
+            // update weight
+
+            // backward
+        }
+        if (!training){
+
+        }
     }
 }
 
@@ -125,4 +144,9 @@ void ConnectedLayer::printOutput()
             std::cout << std::endl;
         }
     }
+}
+
+void ConnectedLayer::setTarget(float* target)
+{
+    this->target = target;
 }

@@ -53,17 +53,32 @@ void Net::init()
         this->initRandomWieght();
     }
 
-    // first layer
+    // input layer
     (this->layers[0])->setInput(this->input);
     (this->layers[0])->setOutput(this->input);
+
+    // output layer
+    if (this->training){
+        assert(this->target && "\nNet::init() ERROR: The target is missing.\n");
+        size_t size = this->layers.size();
+        (this->layers[size-1])->setTarget(this->target);
+    }
 }
 
 void Net::predict(float* input)
 {
+    this->training = false;
     this->input = input;
     this->init();
-    if ((this->layers[1])->prev) ;
-    (this->layers[1])->forward();
+    (this->layers[1])->forward(this->training);
+}
+
+void Net::train(float* input)
+{
+    this->training = true;
+    this->input = input;
+    this->init();
+    (this->layers[1])->forward(this->training);
 }
 
 void Net::free()
