@@ -15,8 +15,8 @@ public:
     virtual ~ConnectedLayer();
 
     void forward(bool training);
-    void backward();
-    void update();
+    void backward(float error);
+    void update(float error);
 
     std::string getType();
     void setIndex(size_t i);

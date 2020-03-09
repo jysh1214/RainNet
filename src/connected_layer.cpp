@@ -30,33 +30,54 @@ void ConnectedLayer::forward(bool training)
     }
 
     std::cout << this->index << std::endl;
-    this->printOutput();
+    this->printWieght();
 
     if (this->next) (this->next)->forward(training);
     if (!this->next){
         if (training){
-            assert(this->target && "\nLayer::forward ERROR: The target is missing.\n");
+            std::cout << "output: " << std::endl;
+            this->printOutput();
             // count error
             float error = (target[0] - this->output[0])*(1 - this->output[0])*this->output[0];
             std::cout << "error: " << error << std::endl;
-            // update weight
-
+            // update wieght
+            this->update(error);
+            std::cout << "update: " << std::endl;
+            this->printWieght();
             // backward
+            (this->prev)->backward(error);
         }
         if (!training){
-
+            std::cout << "output: " << std::endl;
+            this->printOutput();
+            // count error
+            float error = (target[0] - this->output[0])*(1 - this->output[0])*this->output[0];
+            std::cout << "error: " << error << std::endl;
         }
     }
 }
 
-void ConnectedLayer::backward()
+void ConnectedLayer::backward(float error)
 {
-
+    if (this->prev){
+        this->update(error);
+        std::cout << "update: " << std::endl;
+        this->printWieght();
+        (this->prev)->backward(error);
+    }
 }
 
-void ConnectedLayer::update()
+void ConnectedLayer::update(float error)
 {
+    size_t row = (this->prev)->getSize();
+    size_t col = this->size;
 
+    for (size_t i=0; i<row; ++i){
+        for (size_t j=0; j<col; ++j){
+            float* prevOutput = (this->prev)->getOutput();
+            this->wieght[j + col*i] += (error * prevOutput[i]);
+        }
+    }
 }
 
 std::string ConnectedLayer::getType()

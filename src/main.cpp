@@ -21,8 +21,7 @@ int main()
     network.target = target;
 
     network.train(input);
-
-    // network.predict(input);
+    network.predict(input);
     network.free();
 
     return 0;

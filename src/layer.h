@@ -10,8 +10,8 @@ struct Layer
     Layer* prev;
 
     virtual void forward(bool training) = 0;
-    virtual void backward() = 0;
-    virtual void update() = 0;
+    virtual void backward(float error) = 0;
+    virtual void update(float error) = 0;
 
     virtual std::string getType() = 0;
 

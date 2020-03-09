@@ -1,5 +1,12 @@
 #include "net.h"
 
+enum WieghtPolicy
+{
+    RANDOM_WIEGHT,
+    DEFAULT_WIEGHT,
+    LOAD_WIEGHT,
+};
+
 /**
  * createLayerList - create double linked list from the std::vector
  * @vec: the std::vector
@@ -52,6 +59,9 @@ void Net::init()
     if (!loadWieght){
         this->initRandomWieght();
     }
+    if (loadWieght){
+
+    }
 
     // input layer
     (this->layers[0])->setInput(this->input);
@@ -69,7 +79,7 @@ void Net::predict(float* input)
 {
     this->training = false;
     this->input = input;
-    this->init();
+    // this->init();
     (this->layers[1])->forward(this->training);
 }
 
