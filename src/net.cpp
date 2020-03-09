@@ -90,10 +90,3 @@ void Net::train(float* input)
     this->init();
     (this->layers[1])->forward(this->training);
 }
-
-void Net::free()
-{
-    for (Layer* layer: this->layers){
-        delete layer;
-    }
-}

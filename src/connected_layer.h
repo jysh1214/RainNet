@@ -36,6 +36,7 @@ public:
 
 private:
     float(*ActivationFunction)(float);
+    float(*ActivationGradient)(float);
     std::string type;
     size_t index;
     size_t size;

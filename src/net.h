@@ -16,7 +16,6 @@ struct Net
     void initRandomWieght();
     void predict(float* input);
     void train(float* input);
-    void free();
 
     bool training;
     float* input;

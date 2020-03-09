@@ -22,7 +22,6 @@ int main()
 
     network.train(input);
     network.predict(input);
-    network.free();
 
     return 0;
 }

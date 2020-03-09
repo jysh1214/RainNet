@@ -3,6 +3,7 @@
 ConnectedLayer::ConnectedLayer(size_t size, std::string activation)
 {
     this->ActivationFunction = getActivationFunction(activation);
+    this->ActivationGradient = getActivationGradient(activation);
     this->type = "ConnectedLayer";
     this->size = size;
 }
@@ -12,6 +13,7 @@ ConnectedLayer::~ConnectedLayer()
     if (input) delete [] input;
     if (wieght) delete [] wieght;
     if (output) delete [] output;
+    if (target) delete [] target;
 }
 
 void ConnectedLayer::forward(bool training)
@@ -38,7 +40,7 @@ void ConnectedLayer::forward(bool training)
             std::cout << "output: " << std::endl;
             this->printOutput();
             // count error
-            float error = (target[0] - this->output[0])*(1 - this->output[0])*this->output[0];
+            float error = (target[0] - this->output[0]) * ActivationGradient(this->output[0]);
             std::cout << "error: " << error << std::endl;
             // update wieght
             this->update(error);
