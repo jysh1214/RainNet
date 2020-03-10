@@ -31,30 +31,24 @@ void ConnectedLayer::forward(Net* net)
         }
     }
 
-    std::cout << this->index << std::endl;
-    this->printWieght();
-
     if (this->next) (this->next)->forward(net);
     if (!this->next){
         if (net->training){
-            std::cout << "output: " << std::endl;
-            this->printOutput();
+            // this->printOutput();
             // count error
             net->error = (target[0] - this->output[0]) * ActivationGradient(this->output[0]);
             std::cout << "error: " << net->error << std::endl;
             // update wieght
             this->update(net);
-            std::cout << "update: " << std::endl;
-            this->printWieght();
+            // std::cout << "update: " << std::endl;
+            // this->printWieght();
             // backward
             (this->prev)->backward(net);
         }
         if (!net->training){
-            std::cout << "output: " << std::endl;
-            this->printOutput();
             // count error
-            float error = (target[0] - this->output[0]) * ActivationGradient(this->output[0]);
-            std::cout << "error: " << error << std::endl;
+            net->error = (target[0] - this->output[0]) * ActivationGradient(this->output[0]);
+            std::cout << "error: " << net->error << std::endl;
         }
     }
 }
@@ -63,8 +57,6 @@ void ConnectedLayer::backward(Net* net)
 {
     if (this->prev){
         this->update(net);
-        std::cout << "update: " << std::endl;
-        this->printWieght();
         (this->prev)->backward(net);
     }
 }
@@ -75,8 +67,8 @@ void ConnectedLayer::update(Net* net)
     size_t col = this->size;
 
     for (size_t i=0; i<row; ++i){
+        float* prevOutput = (this->prev)->getOutput();
         for (size_t j=0; j<col; ++j){
-            float* prevOutput = (this->prev)->getOutput();
             this->wieght[j + col*i] += (net->error * prevOutput[i]) * net->learningRate;
         }
     }

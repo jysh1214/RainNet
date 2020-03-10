@@ -5,7 +5,6 @@
 
 /**
  * matrixMultiplication - matrix a * matrix b
- * 
  * @a: ar*al matrix
  * @b: br*bl matrix
  * 

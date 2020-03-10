@@ -15,10 +15,9 @@ struct Net
     void init();
     void initRandomWieght();
     void predict(float* input);
-    void train(float* input);
+    void train(float* input, size_t epoch);
 
     bool training;
-    size_t epoch;
     float learningRate;
     float error;
 

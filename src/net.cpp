@@ -83,14 +83,13 @@ void Net::predict(float* input)
     (this->layers[1])->forward(this);
 }
 
-/**
- * TODO: epoch
-*/
-void Net::train(float* input)
+void Net::train(float* input, size_t epoch)
 {
-    assert(this->learningRate && "\nNet::train ERROR: learning rate is not setted.\n");
+    assert(this->learningRate && "\nNet::train ERROR: Learning rate is not setted.\n");
     this->training = true;
     this->input = input;
     this->init();
-    (this->layers[1])->forward(this);
+
+    for (size_t i=0; i<epoch; ++i)
+        (this->layers[1])->forward(this);
 }
