@@ -1,9 +1,11 @@
 #ifndef CONNECTED_LAYER_H
 #define CONNECTED_LAYER_H
 
+#include "net.h"
 #include "layer.h"
 #include "activation_fumction.h"
 #include "matrix_operator.h"
+#include "print.h"
 
 #include <assert.h>
 #include <iostream>
@@ -14,9 +16,9 @@ public:
     ConnectedLayer(size_t size, std::string activation);
     virtual ~ConnectedLayer();
 
-    void forward(bool training);
-    void backward(float error);
-    void update(float error);
+    void forward(Net* net);
+    void backward(Net* net);
+    void update(Net* net);
 
     std::string getType();
     void setIndex(size_t i);

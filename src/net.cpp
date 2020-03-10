@@ -1,12 +1,5 @@
 #include "net.h"
 
-enum WieghtPolicy
-{
-    RANDOM_WIEGHT,
-    DEFAULT_WIEGHT,
-    LOAD_WIEGHT,
-};
-
 /**
  * createLayerList - create double linked list from the std::vector
  * @vec: the std::vector
@@ -53,6 +46,13 @@ void Net::initRandomWieght()
     }
 }
 
+/**
+ * init - init the network
+ * 
+ * 1. load wieght or create wieght
+ * 2. set input layer
+ * 3. set output layer
+*/
 void Net::init()
 {
     createLayerList(this->layers);
@@ -69,7 +69,7 @@ void Net::init()
 
     // output layer
     if (this->training){
-        assert(this->target && "\nNet::init() ERROR: The target is missing.\n");
+        assert(this->target && "\nNet::init() ERROR: The target is not setted.\n");
         size_t size = this->layers.size();
         (this->layers[size-1])->setTarget(this->target);
     }
@@ -80,13 +80,17 @@ void Net::predict(float* input)
     this->training = false;
     this->input = input;
     // this->init();
-    (this->layers[1])->forward(this->training);
+    (this->layers[1])->forward(this);
 }
 
+/**
+ * TODO: epoch
+*/
 void Net::train(float* input)
 {
+    assert(this->learningRate && "\nNet::train ERROR: learning rate is not setted.\n");
     this->training = true;
     this->input = input;
     this->init();
-    (this->layers[1])->forward(this->training);
+    (this->layers[1])->forward(this);
 }

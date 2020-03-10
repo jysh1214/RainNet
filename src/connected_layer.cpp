@@ -16,7 +16,7 @@ ConnectedLayer::~ConnectedLayer()
     if (target) delete [] target;
 }
 
-void ConnectedLayer::forward(bool training)
+void ConnectedLayer::forward(Net* net)
 {
     float* t_output;
     if (this->prev){
@@ -34,42 +34,42 @@ void ConnectedLayer::forward(bool training)
     std::cout << this->index << std::endl;
     this->printWieght();
 
-    if (this->next) (this->next)->forward(training);
+    if (this->next) (this->next)->forward(net);
     if (!this->next){
-        if (training){
+        if (net->training){
+            std::cout << "output: " << std::endl;
+            this->printOutput();
+            // count error
+            net->error = (target[0] - this->output[0]) * ActivationGradient(this->output[0]);
+            std::cout << "error: " << net->error << std::endl;
+            // update wieght
+            this->update(net);
+            std::cout << "update: " << std::endl;
+            this->printWieght();
+            // backward
+            (this->prev)->backward(net);
+        }
+        if (!net->training){
             std::cout << "output: " << std::endl;
             this->printOutput();
             // count error
             float error = (target[0] - this->output[0]) * ActivationGradient(this->output[0]);
             std::cout << "error: " << error << std::endl;
-            // update wieght
-            this->update(error);
-            std::cout << "update: " << std::endl;
-            this->printWieght();
-            // backward
-            (this->prev)->backward(error);
-        }
-        if (!training){
-            std::cout << "output: " << std::endl;
-            this->printOutput();
-            // count error
-            float error = (target[0] - this->output[0])*(1 - this->output[0])*this->output[0];
-            std::cout << "error: " << error << std::endl;
         }
     }
 }
 
-void ConnectedLayer::backward(float error)
+void ConnectedLayer::backward(Net* net)
 {
     if (this->prev){
-        this->update(error);
+        this->update(net);
         std::cout << "update: " << std::endl;
         this->printWieght();
-        (this->prev)->backward(error);
+        (this->prev)->backward(net);
     }
 }
 
-void ConnectedLayer::update(float error)
+void ConnectedLayer::update(Net* net)
 {
     size_t row = (this->prev)->getSize();
     size_t col = this->size;
@@ -77,7 +77,7 @@ void ConnectedLayer::update(float error)
     for (size_t i=0; i<row; ++i){
         for (size_t j=0; j<col; ++j){
             float* prevOutput = (this->prev)->getOutput();
-            this->wieght[j + col*i] += (error * prevOutput[i]);
+            this->wieght[j + col*i] += (net->error * prevOutput[i]) * net->learningRate;
         }
     }
 }
@@ -128,17 +128,7 @@ void ConnectedLayer::printWieght()
     size_t row = (this->prev)->getSize();
     size_t col = this->size;
 
-    if (this->wieght){
-        for (size_t i=0; i<row; ++i){
-            std::cout << "[";
-            for (size_t j=0; j<col; ++j){
-                printf("%6f", this->wieght[j + this->size*i]);
-                if (j != col-1) std::cout << " ,";
-            }
-            std::cout << "]";
-            std::cout << std::endl;
-        }
-    }
+    print(this->wieght, row, col);
 }
 
 void ConnectedLayer::setOutput(float* output)
@@ -156,17 +146,7 @@ void ConnectedLayer::printOutput()
     size_t row = 1;
     size_t col = this->size;
 
-    if (this->output){
-        for (size_t i=0; i<row; ++i){
-            std::cout << "[";
-            for (size_t j=0; j<col; ++j){
-                printf("%6f", this->output[j + this->size*i]);
-                if (j != col-1) std::cout << " ,";
-            }
-            std::cout << "]";
-            std::cout << std::endl;
-        }
-    }
+    print(this->output, row, col);
 }
 
 void ConnectedLayer::setTarget(float* target)

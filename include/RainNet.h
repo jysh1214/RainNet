@@ -6,5 +6,6 @@
 #include "../src/layer.h"
 #include "../src/matrix_operator.h"
 #include "../src/net.h"
+#include "../src/print.h"
 
 #endif

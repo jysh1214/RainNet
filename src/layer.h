@@ -4,14 +4,16 @@
 #include <stdlib.h>
 #include <string>
 
+struct Net;
+
 struct Layer
 {
     Layer* next;
     Layer* prev;
 
-    virtual void forward(bool training) = 0;
-    virtual void backward(float error) = 0;
-    virtual void update(float error) = 0;
+    virtual void forward(Net* net) = 0;
+    virtual void backward(Net* net) = 0;
+    virtual void update(Net* net) = 0;
 
     virtual std::string getType() = 0;
 

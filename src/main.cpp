@@ -10,6 +10,7 @@ float* target = (float*) new float[1];
 int main()
 {
     Net network;
+    network.learningRate = 1;
     network.layers.push_back(layer_0);
     network.layers.push_back(layer_1);
     network.layers.push_back(layer_2);

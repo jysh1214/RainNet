@@ -18,6 +18,10 @@ struct Net
     void train(float* input);
 
     bool training;
+    size_t epoch;
+    float learningRate;
+    float error;
+
     float* input;
     float* target;
     std::vector<Layer*> layers;
