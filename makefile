@@ -2,20 +2,25 @@
 
 SRC=src
 OBJ=obj
-CXXFLAG=-fopenmp -Wno-unused-result -Wno-unused-function
+EXAMPLE=example
+CXXFLAG=-fopenmp -Wno-unused-result -Wno-unused-function -Isrc/ -Iinclude/
 
 all: dirs ./RainNet
 
-./RainNet: $(SRC)/main.cpp\
-$(OBJ)/convolutional_layer.o\
+./RainNet: $(EXAMPLE)/main.cpp\
 $(OBJ)/connected_layer.o\
+$(OBJ)/convolutional_layer.o\
+$(OBJ)/dataset.o\
 $(OBJ)/net.o
 	g++ -Wall $^ -o $@ $(CXXFLAG)
+
+$(OBJ)/connected_layer.o: $(SRC)/connected_layer.cpp $(SRC)/connected_layer.h
+	g++ -Wall -c $< -o $@ $(CXXFLAG)
 
 $(OBJ)/convolutional_layer.o: $(SRC)/convolutional_layer.cpp $(SRC)/convolutional_layer.h
 	g++ -Wall -c $< -o $@ $(CXXFLAG)
 
-$(OBJ)/connected_layer.o: $(SRC)/connected_layer.cpp $(SRC)/connected_layer.h
+$(OBJ)/dataset.o: $(SRC)/dataset.cpp $(SRC)/dataset.h
 	g++ -Wall -c $< -o $@ $(CXXFLAG)
 
 $(OBJ)/net.o: $(SRC)/net.cpp $(SRC)/net.h

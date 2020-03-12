@@ -24,7 +24,6 @@ static void print(float* data, size_t row, size_t col)
             else {
                 printf("%.6f", data[j + col*i]);
             }
-            
             if (j != col-1) std::cout << " ,";
         }
         std::cout << "]";
