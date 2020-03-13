@@ -26,7 +26,7 @@ int main()
     network.predict(input);
 
     // read MNIST
-    Dataset trainDataset("../data/mnist/train-images-idx3-ubyte");
+    Dataset trainDataset("data/mnist/train-images-idx3-ubyte");
 
     return 0;
 }
