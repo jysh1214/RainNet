@@ -20,7 +20,7 @@ public:
     std::string getType();
     void setIndex(size_t i);
     size_t getIndex();
-    size_t getSize();
+    size_t getSize(); // banned
     size_t getHeight();
     size_t getWidth();
     size_t getChannel();

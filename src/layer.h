@@ -29,9 +29,9 @@ struct Layer
 
     virtual void setInput(float* input) = 0;
     virtual float* getInput() = 0;
-    virtual void setweight(float* weight) = 0;
-    virtual float* getweight() = 0;
-    virtual void printweight() = 0;
+    virtual void setWeight(float* weight) = 0;
+    virtual float* getWeight() = 0;
+    virtual void printWeight() = 0;
     virtual void setOutput(float* output) = 0;
     virtual float* getOutput() = 0;
     virtual void printOutput() = 0;

@@ -33,15 +33,11 @@ void ConnectedLayer::forward(Net* net)
     if (this->next) (this->next)->forward(net);
     if (!this->next){
         if (net->training){
-            // this->printOutput();
             // count error
             net->error = (net->target[0] - this->output[0]) * ActivationGradient(this->output[0]);
             std::cout << "error: " << net->error << std::endl;
             // update weight
             this->update(net);
-            // std::cout << "update: " << std::endl;
-            // this->printweight();
-            // backward
             (this->prev)->backward(net);
         }
         if (!net->training){
@@ -96,19 +92,19 @@ size_t ConnectedLayer::getSize()
 
 size_t ConnectedLayer::getHeight()
 {
-    std::cout << "ConnectedLayer::getHeight can't be used." << std::endl;
+    std::cout << "\nConnectedLayer::getHeight can't be used.\n" << std::endl;
     exit(0);
 }
 
 size_t ConnectedLayer::getWidth()
 {
-    std::cout << "ConnectedLayer::getWidth can't be used." << std::endl;
+    std::cout << "\nConnectedLayer::getWidth can't be used.\n" << std::endl;
     exit(0);
 }
 
 size_t ConnectedLayer::getChannel()
 {
-    std::cout << "ConnectedLayer::getChannel can't be used." << std::endl;
+    std::cout << "\nConnectedLayer::getChannel can't be used.\n" << std::endl;
     exit(0);
 }
 
@@ -122,17 +118,17 @@ float* ConnectedLayer::getInput()
     return this->input;
 }
 
-void ConnectedLayer::setweight(float* weight)
+void ConnectedLayer::setWeight(float* weight)
 {
     this->weight = weight;
 }
 
-float* ConnectedLayer::getweight()
+float* ConnectedLayer::getWeight()
 {
     return this->weight;
 }
 
-void ConnectedLayer::printweight()
+void ConnectedLayer::printWeight()
 {
     size_t row = (this->prev)->getSize();
     size_t col = this->size;

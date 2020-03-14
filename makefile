@@ -5,9 +5,10 @@ OBJ=obj
 EXAMPLE=example
 CXXFLAG=-fopenmp -Wno-unused-result -Wno-unused-function -Isrc/ -Iinclude/
 
-all: dirs ./RainNet
+all: dirs $(EXAMPLE)/nn/nn
 
-./RainNet: $(EXAMPLE)/main.cpp\
+# nn
+$(EXAMPLE)/nn/nn: $(EXAMPLE)/nn/main.cpp\
 $(OBJ)/connected_layer.o\
 $(OBJ)/convolutional_layer.o\
 $(OBJ)/dataset.o\
@@ -30,7 +31,7 @@ dirs:
 	mkdir -p $(SRC) $(OBJ)
 
 clean:
-	rm -rf $(OBJ) ./RainNet .vscode
+	rm -rf $(OBJ) $(EXAMPLE)/nn/nn .vscode
 
 state:
 	wc src/*

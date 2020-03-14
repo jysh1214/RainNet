@@ -4,6 +4,25 @@
 #include <stdlib.h>
 
 /**
+ * Row - major
+ * 
+ * matrix: 1 x N => matrix[N]
+ * for (int i=0; i<N; ++i)
+ *     matrix[i];
+ * 
+ * matrix: N x M => matrix[N * M]
+ * for (int i=0; i<N; ++i)
+ *     for (int j=0; j<M; ++j)
+ *         matrix[i*M + j];
+ * 
+ * matrix: N x M x C => matrix[N * M * C]
+ * for (int i=0; i<N; ++i)
+ *     for (int j=0; j<M; ++j)
+ *         for (int k=0; k<C; ++k)
+ *             matrix[i*M*C + j*C + k];
+*/
+
+/**
  * matrixMultiplication - matrix a * matrix b
  * @a: ar*al matrix
  * @b: br*bl matrix

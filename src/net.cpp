@@ -41,6 +41,7 @@ void Net::createRandomWeight()
     for (size_t i=1; i<this->layers.size(); ++i){
         std::string layerType = (this->layers[i])->getType();
         float* weight;
+
         if (layerType == "ConnectedLayer"){
             size_t a = (this->layers[i]->prev)->getSize();
             size_t b = (this->layers[i])->getSize();
@@ -49,11 +50,12 @@ void Net::createRandomWeight()
             for (size_t j=0; j<a*b; ++j){
                 weight[j] = (float(rand()%200)/100) - 1;
             }
-        } else if (layerType == "ConvolutionalLayer"){
+        }
+        if (layerType == "ConvolutionalLayer"){
             // TODO: fuck
         }
 
-        (this->layers[i])->setweight(weight);
+        (this->layers[i])->setWeight(weight);
     }
 }
 
@@ -69,14 +71,12 @@ void Net::init()
         this->createRandomWeight();
     }
     if (loadweight){
-
+        // TODO: load weight
     }
 
-    // input layer
+    // input layer: input = output
     (this->layers[0])->setInput(this->input);
     (this->layers[0])->setOutput(this->input);
-
-    // output layer
 }
 
 void Net::predict(float* input)

@@ -24,15 +24,15 @@ public:
     void setIndex(size_t i);
     size_t getIndex();
     size_t getSize();
-    size_t getHeight();
-    size_t getWidth();
-    size_t getChannel();
+    size_t getHeight();  // banned
+    size_t getWidth();   // banned
+    size_t getChannel(); // banned
     
     void setInput(float* input);
     float* getInput();
-    void setweight(float* weight);
-    float* getweight();
-    void printweight();
+    void setWeight(float* weight);
+    float* getWeight();
+    void printWeight();
     void setOutput(float* output);
     float* getOutput();
     void printOutput();

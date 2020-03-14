@@ -1,5 +1,12 @@
 #include "convolutional_layer.h"
 
+/**
+ * ConvolutionalLayer constructor
+ * 
+ * @height: row of the matrix
+ * @width: col of the matrix
+ * @channel: batch of matrix
+*/
 ConvolutionalLayer::ConvolutionalLayer(size_t height, size_t width, size_t channel, std::string activation)
 {
     this->ActivationFunction = getActivationFunction(activation);
@@ -39,7 +46,7 @@ std::string ConvolutionalLayer::getType()
 
 void ConvolutionalLayer::setIndex(size_t i)
 {
-
+    this->index = i;
 }
 
 size_t ConvolutionalLayer::getIndex()
@@ -49,12 +56,12 @@ size_t ConvolutionalLayer::getIndex()
 
 void ConvolutionalLayer::setInput(float* input)
 {
-
+    this->input = input;
 }
 
 float* ConvolutionalLayer::getInput()
 {
-
+    return this->input;
 }
 
 size_t ConvolutionalLayer::getSize()
@@ -85,7 +92,7 @@ void ConvolutionalLayer::setweight(float* weight)
 
 float* ConvolutionalLayer::getweight()
 {
-
+    return this->weight;
 }
 
 void ConvolutionalLayer::printweight()
@@ -95,12 +102,12 @@ void ConvolutionalLayer::printweight()
 
 void ConvolutionalLayer::setOutput(float* output)
 {
-
+    this->output = output;
 }
 
 float* ConvolutionalLayer::getOutput()
 {
-
+    return this->output;
 }
 
 void ConvolutionalLayer::printOutput()
