@@ -24,17 +24,18 @@ public:
     void setIndex(size_t i);
     size_t getIndex();
     size_t getSize();
+    size_t getHeight();
+    size_t getWidth();
+    size_t getChannel();
     
     void setInput(float* input);
     float* getInput();
-    void setWieght(float* wieght);
-    float* getWieght();
-    void printWieght();
+    void setweight(float* weight);
+    float* getweight();
+    void printweight();
     void setOutput(float* output);
     float* getOutput();
     void printOutput();
-
-    void setTarget(float* target);
 
 private:
     float(*ActivationFunction)(float);
@@ -44,9 +45,8 @@ private:
     size_t size;
 
     float* input;
-    float* wieght;
+    float* weight;
     float* output;
-    float* target;
 };
 
 #endif

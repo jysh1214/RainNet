@@ -13,7 +13,7 @@
 struct Net
 {
     void init();
-    void initRandomWieght();
+    void createRandomWeight();
     void predict(float* input);
     void train(float* input, size_t epoch);
 
@@ -24,7 +24,7 @@ struct Net
     float* input;
     float* target;
     std::vector<Layer*> layers;
-    bool loadWieght = false;
+    bool loadweight = false;
 };
 
 #endif

@@ -26,40 +26,49 @@ void createLayerList(std::vector<Layer*>& vec)
 }
 
 /**
- * initRandomWieght - create wieght between [-1, 1] randomly
+ * initRandomweight - create weight between [-1, 1] randomly
+ * 
+ * for:
+ * 1. connected layer
+ * 2. convolutional layer
  * 
  * NOTE: first layer size equal to input data
 */
-void Net::initRandomWieght()
+void Net::createRandomWeight()
 {
     srand(time(NULL));
 
     for (size_t i=1; i<this->layers.size(); ++i){
-        size_t a = (this->layers[i]->prev)->getSize();
-        size_t b = (this->layers[i])->getSize();
+        std::string layerType = (this->layers[i])->getType();
+        float* weight;
+        if (layerType == "ConnectedLayer"){
+            size_t a = (this->layers[i]->prev)->getSize();
+            size_t b = (this->layers[i])->getSize();
 
-        float* wieght = (float*) new float[a*b];
-        for (size_t j=0; j<a*b; ++j){
-            wieght[j] = (float(rand()%200)/100) - 1;
+            weight = (float*) new float[a*b];
+            for (size_t j=0; j<a*b; ++j){
+                weight[j] = (float(rand()%200)/100) - 1;
+            }
+        } else if (layerType == "ConvolutionalLayer"){
+            // TODO: fuck
         }
-        (this->layers[i])->setWieght(wieght);
+
+        (this->layers[i])->setweight(weight);
     }
 }
 
 /**
  * init - init the network
  * 
- * 1. load wieght or create wieght
- * 2. set input layer
- * 3. set output layer
+ * load weight or create weight
 */
 void Net::init()
 {
     createLayerList(this->layers);
-    if (!loadWieght){
-        this->initRandomWieght();
+    if (!loadweight){
+        this->createRandomWeight();
     }
-    if (loadWieght){
+    if (loadweight){
 
     }
 
@@ -68,11 +77,6 @@ void Net::init()
     (this->layers[0])->setOutput(this->input);
 
     // output layer
-    if (this->training){
-        assert(this->target && "\nNet::init() ERROR: The target is not setted.\n");
-        size_t size = this->layers.size();
-        (this->layers[size-1])->setTarget(this->target);
-    }
 }
 
 void Net::predict(float* input)
