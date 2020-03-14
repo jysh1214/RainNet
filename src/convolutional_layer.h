@@ -10,7 +10,7 @@
 struct ConvolutionalLayer: public Layer
 {
 public:
-    ConvolutionalLayer(size_t height, size_t width, size_t batch, std::string activation);
+    ConvolutionalLayer(size_t row, size_t col, size_t channel, size_t padding, size_t stride, std::string activation);
     virtual ~ConvolutionalLayer();
 
     void forward(Net* net);
@@ -21,15 +21,15 @@ public:
     void setIndex(size_t i);
     size_t getIndex();
     size_t getSize(); // banned
-    size_t getHeight();
-    size_t getWidth();
+    size_t getKernelRow();
+    size_t getKernelCol();
     size_t getChannel();
     
     void setInput(float* input);
     float* getInput();
-    void setweight(float* weight);
-    float* getweight();
-    void printweight();
+    void setWeight(float* weight);
+    float* getWeight();
+    void printWeight();
     void setOutput(float* output);
     float* getOutput();
     void printOutput();
@@ -39,9 +39,12 @@ private:
     float(*ActivationGradient)(float);
     std::string type;
     size_t index;
-    size_t height;
-    size_t width;
+    size_t size;
+    size_t kernelRow;
+    size_t kernelCol;
     size_t channel;
+    size_t padding;
+    size_t stride;
 
     float* input;
     float* weight;

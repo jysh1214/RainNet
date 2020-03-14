@@ -46,13 +46,23 @@ void Net::createRandomWeight()
             size_t a = (this->layers[i]->prev)->getSize();
             size_t b = (this->layers[i])->getSize();
 
-            weight = (float*) new float[a*b];
+            weight = (float*) new float[a * b];
             for (size_t j=0; j<a*b; ++j){
                 weight[j] = (float(rand()%200)/100) - 1;
             }
         }
         if (layerType == "ConvolutionalLayer"){
-            // TODO: fuck
+            // weight size: row * col * ((output channel) * (input channel))
+            size_t row = (this->layers[i])->getKernelRow();
+            size_t col = (this->layers[i])->getKernelCol();
+            size_t ich = (this->layers[i]->prev)->getChannel();
+            size_t och = (this->layers[i])->getChannel();
+
+            size_t h = row*col*ich*och;
+            weight = (float*) new float[h];
+            for (size_t j=0; j<h; ++j){
+                weight[j] = (float(rand()%200)/100) - 1;
+            }
         }
 
         (this->layers[i])->setWeight(weight);

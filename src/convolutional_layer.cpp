@@ -1,20 +1,15 @@
 #include "convolutional_layer.h"
 
-/**
- * ConvolutionalLayer constructor
- * 
- * @height: row of the matrix
- * @width: col of the matrix
- * @channel: batch of matrix
-*/
-ConvolutionalLayer::ConvolutionalLayer(size_t height, size_t width, size_t channel, std::string activation)
+ConvolutionalLayer::ConvolutionalLayer(size_t row, size_t col, size_t channel, size_t padding, size_t stride, std::string activation)
 {
     this->ActivationFunction = getActivationFunction(activation);
     this->ActivationGradient = getActivationGradient(activation);
     this->type = "ConvolutionalLayer";
-    this->height = height;
-    this->width = width;
+    this->kernelRow = row;
+    this->kernelCol = col;
     this->channel = channel;
+    this->padding = padding;
+    this->stride = stride;
 }
 
 ConvolutionalLayer::~ConvolutionalLayer()
@@ -26,17 +21,42 @@ ConvolutionalLayer::~ConvolutionalLayer()
 
 void ConvolutionalLayer::forward(Net* net)
 {
+    float* t_output;
+    if (this->prev){
+        // TODO: conv
+        // t_output = conv();
+    }
+    
+    if (t_output) this->output = t_output;
+    if (ActivationFunction){
+        for (size_t i=0; i<this->size; ++i){
+            this->output[i] = ActivationFunction(this->output[i]);
+        }
+    }
 
+    if (this->next) (this->next)->forward(net);
+    if (!this->next){
+        if (net->training){
+            // count error
+            // update weight
+        }
+        if (!net->training){
+            // count error
+        }
+    }
 }
 
 void ConvolutionalLayer::backward(Net* net)
 {
-
+    if (this->prev){
+        this->update(net);
+        (this->prev)->backward(net);
+    }
 }
 
 void ConvolutionalLayer::update(Net* net)
 {
-
+    std::cout << "fuck" << std::endl;
 }
 
 std::string ConvolutionalLayer::getType()
@@ -70,14 +90,14 @@ size_t ConvolutionalLayer::getSize()
     exit(0);
 }
 
-size_t ConvolutionalLayer::getHeight()
+size_t ConvolutionalLayer::getKernelRow()
 {
-    return this->height;
+    return this->kernelRow;
 }
 
-size_t ConvolutionalLayer::getWidth()
+size_t ConvolutionalLayer::getKernelCol()
 {
-    return this->width;
+    return this->kernelCol;
 }
 
 size_t ConvolutionalLayer::getChannel()
@@ -85,17 +105,17 @@ size_t ConvolutionalLayer::getChannel()
     return this->channel;
 }
 
-void ConvolutionalLayer::setweight(float* weight)
+void ConvolutionalLayer::setWeight(float* weight)
 {
 
 }
 
-float* ConvolutionalLayer::getweight()
+float* ConvolutionalLayer::getWeight()
 {
     return this->weight;
 }
 
-void ConvolutionalLayer::printweight()
+void ConvolutionalLayer::printWeight()
 {
 
 }

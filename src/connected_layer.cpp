@@ -90,15 +90,15 @@ size_t ConnectedLayer::getSize()
     return this->size;
 }
 
-size_t ConnectedLayer::getHeight()
+size_t ConnectedLayer::getKernelRow()
 {
-    std::cout << "\nConnectedLayer::getHeight can't be used.\n" << std::endl;
+    std::cout << "\nConnectedLayer::getKernelRow can't be used.\n" << std::endl;
     exit(0);
 }
 
-size_t ConnectedLayer::getWidth()
+size_t ConnectedLayer::getKernelCol()
 {
-    std::cout << "\nConnectedLayer::getWidth can't be used.\n" << std::endl;
+    std::cout << "\nConnectedLayer::getKernelCol can't be used.\n" << std::endl;
     exit(0);
 }
 

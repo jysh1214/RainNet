@@ -24,9 +24,9 @@ public:
     void setIndex(size_t i);
     size_t getIndex();
     size_t getSize();
-    size_t getHeight();  // banned
-    size_t getWidth();   // banned
-    size_t getChannel(); // banned
+    size_t getKernelRow(); // banned
+    size_t getKernelCol(); // banned
+    size_t getChannel();   // banned
     
     void setInput(float* input);
     float* getInput();
