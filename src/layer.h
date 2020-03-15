@@ -1,6 +1,8 @@
 #ifndef LAYER_H
 #define LAYER_H
 
+#include "matrix_operator.h"
+
 #include <stdlib.h>
 #include <string>
 
@@ -37,13 +39,13 @@ struct Layer
     */
     virtual size_t getChannel() = 0;
 
-    virtual void setInput(float* input) = 0;
-    virtual float* getInput() = 0;
-    virtual void setWeight(float* weight) = 0;
-    virtual float* getWeight() = 0;
+    virtual void setInput(tensor* input) = 0;
+    virtual tensor* getInput() = 0;
+    virtual void setWeight(tensor* weight) = 0;
+    virtual tensor* getWeight() = 0;
     virtual void printWeight() = 0;
-    virtual void setOutput(float* output) = 0;
-    virtual float* getOutput() = 0;
+    virtual void setOutput(tensor* output) = 0;
+    virtual tensor* getOutput() = 0;
     virtual void printOutput() = 0;
 };
 

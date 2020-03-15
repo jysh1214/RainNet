@@ -25,13 +25,13 @@ public:
     size_t getKernelCol();
     size_t getChannel();
     
-    void setInput(float* input);
-    float* getInput();
-    void setWeight(float* weight);
-    float* getWeight();
+    void setInput(tensor* input);
+    tensor* getInput();
+    void setWeight(tensor* weight);
+    tensor* getWeight();
     void printWeight();
-    void setOutput(float* output);
-    float* getOutput();
+    void setOutput(tensor* output);
+    tensor* getOutput();
     void printOutput();
 
 private:
@@ -46,9 +46,9 @@ private:
     size_t padding;
     size_t stride;
 
-    float* input;
-    float* weight;
-    float* output;
+    tensor* input;
+    tensor* weight;
+    tensor* output;
 };
 
 #endif

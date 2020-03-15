@@ -10,23 +10,24 @@ ConnectedLayer::ConnectedLayer(size_t size, std::string activation)
 
 ConnectedLayer::~ConnectedLayer()
 {
-    if (input) delete [] input;
-    if (weight) delete [] weight;
-    if (output) delete [] output;
+    if (input) delete input;
+    if (weight) delete weight;
+    if (output) delete output;
 }
 
 void ConnectedLayer::forward(Net* net)
 {
-    float* t_output;
+    assert(this->weight && "ConnectedLayer::forward ERROR: The weight missing.");
+
+    tensor* t_output;
     if (this->prev){
-        t_output =
-        matrixMultiplication((this->prev)->getOutput(), this->weight, 1, (this->prev)->getSize(), this->size);
+        t_output = matrixMultiplication((this->prev)->getOutput(), this->weight);
     }
     
     if (t_output) this->output = t_output;
     if (ActivationFunction){
         for (size_t i=0; i<this->size; ++i){
-            this->output[i] = ActivationFunction(this->output[i]);
+            (this->output)->data[i] = ActivationFunction((this->output)->data[i]);
         }
     }
 
@@ -34,7 +35,9 @@ void ConnectedLayer::forward(Net* net)
     if (!this->next){
         if (net->training){
             // count error
-            net->error = (net->target[0] - this->output[0]) * ActivationGradient(this->output[0]);
+            net->error = net->LossFunction(net->target, this->output);
+            // net->error = (net->target[0] - this->output[0]) * ActivationGradient(this->output[0]);
+            net->error *= ActivationGradient(net->error);
             std::cout << "error: " << net->error << std::endl;
             // update weight
             this->update(net);
@@ -42,7 +45,9 @@ void ConnectedLayer::forward(Net* net)
         }
         if (!net->training){
             // count error
-            net->error = (net->target[0] - this->output[0]) * ActivationGradient(this->output[0]);
+            // net->error = (net->target[0] - this->output[0]) * ActivationGradient(this->output[0]);
+            net->error = net->LossFunction(net->target, this->output);
+            net->error *= ActivationGradient(net->error);
             std::cout << "error: " << net->error << std::endl;
         }
     }
@@ -58,13 +63,14 @@ void ConnectedLayer::backward(Net* net)
 
 void ConnectedLayer::update(Net* net)
 {
+    assert(net->error && "ConnectedLayer::update ERROR: The error missing.");
     size_t row = (this->prev)->getSize();
     size_t col = this->size;
 
     for (size_t i=0; i<row; ++i){
-        float* prevOutput = (this->prev)->getOutput();
+        tensor* prevOutput = (this->prev)->getOutput();
         for (size_t j=0; j<col; ++j){
-            this->weight[j + col*i] += (net->error * prevOutput[i]) * net->learningRate;
+            (this->weight)->data[i*col + j] += (net->error * prevOutput->data[i]) * net->learningRate;
         }
     }
 }
@@ -108,22 +114,22 @@ size_t ConnectedLayer::getChannel()
     exit(0);
 }
 
-void ConnectedLayer::setInput(float* input)
+void ConnectedLayer::setInput(tensor* input)
 {
     this->input = input;
 }
 
-float* ConnectedLayer::getInput()
+tensor* ConnectedLayer::getInput()
 {
     return this->input;
 }
 
-void ConnectedLayer::setWeight(float* weight)
+void ConnectedLayer::setWeight(tensor* weight)
 {
     this->weight = weight;
 }
 
-float* ConnectedLayer::getWeight()
+tensor* ConnectedLayer::getWeight()
 {
     return this->weight;
 }
@@ -133,15 +139,15 @@ void ConnectedLayer::printWeight()
     size_t row = (this->prev)->getSize();
     size_t col = this->size;
 
-    print(this->weight, row, col);
+    // print(this->weight, row, col);
 }
 
-void ConnectedLayer::setOutput(float* output)
+void ConnectedLayer::setOutput(tensor* output)
 {
     this->output = output;
 }
 
-float* ConnectedLayer::getOutput()
+tensor* ConnectedLayer::getOutput()
 {
     return this->output;
 }
@@ -151,6 +157,6 @@ void ConnectedLayer::printOutput()
     size_t row = 1;
     size_t col = this->size;
 
-    print(this->output, row, col);
+    // print(this->output, row, col);
 }
 

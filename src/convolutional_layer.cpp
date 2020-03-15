@@ -14,23 +14,28 @@ ConvolutionalLayer::ConvolutionalLayer(size_t row, size_t col, size_t channel, s
 
 ConvolutionalLayer::~ConvolutionalLayer()
 {
-    if (input) delete [] input;
-    if (weight) delete [] weight;
-    if (output) delete [] output;
+    if (input) delete input;
+    if (weight) delete weight;
+    if (output) delete output;
 }
 
 void ConvolutionalLayer::forward(Net* net)
 {
-    float* t_output;
+    assert(this->weight && "ConvolutionalLayer::forward ERROR: The weight missing.");
+
+    tensor* t_output;
     if (this->prev){
-        // TODO: conv
-        // t_output = conv();
+        // conv
+        std::cout << "fuck" << std::endl;
     }
     
     if (t_output) this->output = t_output;
     if (ActivationFunction){
-        for (size_t i=0; i<this->size; ++i){
-            this->output[i] = ActivationFunction(this->output[i]);
+        size_t a = this->getKernelRow();
+        size_t b = this->getKernelCol();
+        size_t c = this->getChannel();
+        for (size_t i=0; i<(a*b*c); ++i){
+            (this->output)->data[i] = ActivationFunction((this->output)->data[i]);
         }
     }
 
@@ -74,12 +79,12 @@ size_t ConvolutionalLayer::getIndex()
     return this->index;
 }
 
-void ConvolutionalLayer::setInput(float* input)
+void ConvolutionalLayer::setInput(tensor* input)
 {
     this->input = input;
 }
 
-float* ConvolutionalLayer::getInput()
+tensor* ConvolutionalLayer::getInput()
 {
     return this->input;
 }
@@ -105,12 +110,12 @@ size_t ConvolutionalLayer::getChannel()
     return this->channel;
 }
 
-void ConvolutionalLayer::setWeight(float* weight)
+void ConvolutionalLayer::setWeight(tensor* weight)
 {
-
+    this->weight = weight;
 }
 
-float* ConvolutionalLayer::getWeight()
+tensor* ConvolutionalLayer::getWeight()
 {
     return this->weight;
 }
@@ -120,12 +125,12 @@ void ConvolutionalLayer::printWeight()
 
 }
 
-void ConvolutionalLayer::setOutput(float* output)
+void ConvolutionalLayer::setOutput(tensor* output)
 {
     this->output = output;
 }
 
-float* ConvolutionalLayer::getOutput()
+tensor* ConvolutionalLayer::getOutput()
 {
     return this->output;
 }

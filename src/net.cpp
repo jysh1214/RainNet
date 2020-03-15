@@ -40,29 +40,29 @@ void Net::createRandomWeight()
 
     for (size_t i=1; i<this->layers.size(); ++i){
         std::string layerType = (this->layers[i])->getType();
-        float* weight;
+        tensor* weight;
 
         if (layerType == "ConnectedLayer"){
             size_t a = (this->layers[i]->prev)->getSize();
             size_t b = (this->layers[i])->getSize();
 
-            weight = (float*) new float[a * b];
+            weight = new tensor(a, b, 1);
             for (size_t j=0; j<a*b; ++j){
-                weight[j] = (float(rand()%200)/100) - 1;
+                weight->data[j] = (float(rand()%200)/100) - 1;
             }
         }
         if (layerType == "ConvolutionalLayer"){
             // weight size: row * col * ((output channel) * (input channel))
-            size_t row = (this->layers[i])->getKernelRow();
-            size_t col = (this->layers[i])->getKernelCol();
-            size_t ich = (this->layers[i]->prev)->getChannel();
-            size_t och = (this->layers[i])->getChannel();
+            // size_t a = (this->layers[i])->getKernelRow();
+            // size_t b = (this->layers[i])->getKernelCol();
+            // size_t c = (this->layers[i]->prev)->getChannel();
+            // size_t d = (this->layers[i])->getChannel();
 
-            size_t h = row*col*ich*och;
-            weight = (float*) new float[h];
-            for (size_t j=0; j<h; ++j){
-                weight[j] = (float(rand()%200)/100) - 1;
-            }
+            // size_t e = a*b*c*d;
+            // weight = (float*) new float[e];
+            // for (size_t j=0; j<e; ++j){
+            //     weight[j] = (float(rand()%200)/100) - 1;
+            // }
         }
 
         (this->layers[i])->setWeight(weight);
@@ -89,7 +89,10 @@ void Net::init()
     (this->layers[0])->setOutput(this->input);
 }
 
-void Net::predict(float* input)
+/**
+ * predict - use existed weight
+*/
+void Net::predict(tensor* input)
 {
     this->training = false;
     this->input = input;
@@ -97,9 +100,13 @@ void Net::predict(float* input)
     (this->layers[1])->forward(this);
 }
 
-void Net::train(float* input, size_t epoch)
+void Net::train(tensor* input, size_t epoch)
 {
+    assert(this->LossFunction && "\nNet::train ERROR: Loss function is not setted.\n");
     assert(this->learningRate && "\nNet::train ERROR: Learning rate is not setted.\n");
+
+    this->LossFunction = getLossFunction(this->lossFunction);
+
     this->training = true;
     this->input = input;
     this->init();

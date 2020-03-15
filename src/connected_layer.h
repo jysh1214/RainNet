@@ -4,6 +4,7 @@
 #include "net.h"
 #include "layer.h"
 #include "activation_fumction.h"
+#include "loss_function.h"
 #include "matrix_operator.h"
 #include "print.h"
 
@@ -28,13 +29,13 @@ public:
     size_t getKernelCol(); // banned
     size_t getChannel();   // banned
     
-    void setInput(float* input);
-    float* getInput();
-    void setWeight(float* weight);
-    float* getWeight();
+    void setInput(tensor* input);
+    tensor* getInput();
+    void setWeight(tensor* weight);
+    tensor* getWeight();
     void printWeight();
-    void setOutput(float* output);
-    float* getOutput();
+    void setOutput(tensor* output);
+    tensor* getOutput();
     void printOutput();
 
 private:
@@ -44,9 +45,9 @@ private:
     size_t index;
     size_t size;
 
-    float* input;
-    float* weight;
-    float* output;
+    tensor* input;
+    tensor* weight;
+    tensor* output;
 };
 
 #endif
