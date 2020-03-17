@@ -113,6 +113,35 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
 
     tensor* output = new tensor(outputRow, outputCol, outputChannel);
     tensor* matrix = paddingZero(input, padding);
+
+    if (kernel->row == 1 && kernel->col == 1){
+        outputRow = input->row;
+        outputCol = input->col;
+        matrix = input;
+    }
+
+    for (size_t k=0; k<outputChannel; ++k){
+        for (size_t i=0; i<outputRow; ++i){
+            for (size_t j=0; j<outputCol; ++j){
+
+                float result = 0.0;
+                    for (size_t kr=0; kr<kernel->row; ++kr){
+                        for (size_t kl=0; kl<kernel->col; ++kl){
+                            result += kernel->data[k*(kernel->row)*(kernel->col) + kr*(kernel->col) + kl] * 
+                            matrix->data[k*(kernel->row)*(kernel->col) + (kr+i)*(kernel->col) + (kl+j)];
+                        }
+                    }
+                output->data[k*(outputRow)*(outputCol) + i*(outputCol) + j] = result;
+                result = 0.0;
+            }
+        }
+    }
+
+    if (matrix != input) delete matrix;
+
+    print(output->data, output->row, output->col, output->channel);
+
+    return output;
 }
 
 #endif
