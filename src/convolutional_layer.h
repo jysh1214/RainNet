@@ -4,13 +4,13 @@
 #include "net.h"
 #include "layer.h"
 #include "activation_fumction.h"
-#include "matrix_operator.h"
+#include "tensor_operator.h"
 #include "print.h"
 
 struct ConvolutionalLayer: public Layer
 {
 public:
-    ConvolutionalLayer(size_t row, size_t col, size_t channel, size_t padding, size_t stride, std::string activation);
+    ConvolutionalLayer(size_t filters, size_t row, size_t col, size_t padding, size_t stride, std::string activation);
     virtual ~ConvolutionalLayer();
 
     void forward(Net* net);
@@ -21,9 +21,9 @@ public:
     void setIndex(size_t i);
     size_t getIndex();
     size_t getSize(); // banned
+    size_t getFilters();
     size_t getKernelRow();
     size_t getKernelCol();
-    size_t getChannel();
     
     void setInput(tensor* input);
     tensor* getInput();
@@ -39,10 +39,9 @@ private:
     float(*ActivationGradient)(float);
     std::string type;
     size_t index;
-    size_t size;
+    size_t filters;
     size_t kernelRow;
     size_t kernelCol;
-    size_t channel;
     size_t padding;
     size_t stride;
 

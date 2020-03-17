@@ -1,13 +1,13 @@
 #include "convolutional_layer.h"
 
-ConvolutionalLayer::ConvolutionalLayer(size_t row, size_t col, size_t channel, size_t padding, size_t stride, std::string activation)
+ConvolutionalLayer::ConvolutionalLayer(size_t filters, size_t row, size_t col, size_t padding, size_t stride, std::string activation)
 {
     this->ActivationFunction = getActivationFunction(activation);
     this->ActivationGradient = getActivationGradient(activation);
     this->type = "ConvolutionalLayer";
+    this->filters = filters;
     this->kernelRow = row;
     this->kernelCol = col;
-    this->channel = channel;
     this->padding = padding;
     this->stride = stride;
 }
@@ -25,15 +25,14 @@ void ConvolutionalLayer::forward(Net* net)
 
     tensor* t_output;
     if (this->prev){
-        // conv
-        std::cout << "fuck" << std::endl;
+        t_output = convolution((this->prev)->getOutput(), this->weight, this->padding, this->stride);
     }
     
     if (t_output) this->output = t_output;
     if (ActivationFunction){
-        size_t a = this->getKernelRow();
-        size_t b = this->getKernelCol();
-        size_t c = this->getChannel();
+        size_t a = 1;
+        size_t b = 2;
+        size_t c = 3;
         for (size_t i=0; i<(a*b*c); ++i){
             (this->output)->data[i] = ActivationFunction((this->output)->data[i]);
         }
@@ -95,6 +94,11 @@ size_t ConvolutionalLayer::getSize()
     exit(0);
 }
 
+size_t ConvolutionalLayer::getFilters()
+{
+    return this->filters;
+}
+
 size_t ConvolutionalLayer::getKernelRow()
 {
     return this->kernelRow;
@@ -103,11 +107,6 @@ size_t ConvolutionalLayer::getKernelRow()
 size_t ConvolutionalLayer::getKernelCol()
 {
     return this->kernelCol;
-}
-
-size_t ConvolutionalLayer::getChannel()
-{
-    return this->channel;
 }
 
 void ConvolutionalLayer::setWeight(tensor* weight)

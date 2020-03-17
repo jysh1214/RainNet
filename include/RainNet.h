@@ -6,8 +6,9 @@
 #include "../src/convolutional_layer.h"
 #include "../src/dataset.h"
 #include "../src/layer.h"
-#include "../src/matrix_operator.h"
 #include "../src/net.h"
 #include "../src/print.h"
+#include "../src/softmax.h"
+#include "../src/tensor_operator.h"
 
 #endif

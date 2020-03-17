@@ -1,8 +1,8 @@
 #include "RainNet.h"
 
-Layer* layer_0 = new ConnectedLayer(2, "sigmoid");
-Layer* layer_1 = new ConnectedLayer(2, "sigmoid");
-Layer* layer_2 = new ConnectedLayer(1, "sigmoid");
+Layer* layer_0 = new ConnectedLayer(2, "tanh");
+Layer* layer_1 = new ConnectedLayer(2, "tanh");
+Layer* layer_2 = new ConnectedLayer(1, "tanh");
 
 tensor* input = new tensor(1, 2, 1); // input: [a_1, a_2, ...]
 tensor* target = new tensor(1, 1, 1);

@@ -85,7 +85,6 @@ void ConnectedLayer::setIndex(size_t i)
     this->index = i;
 }
 
-
 size_t ConnectedLayer::getIndex()
 {
     return this->index;
@@ -96,21 +95,21 @@ size_t ConnectedLayer::getSize()
     return this->size;
 }
 
+size_t ConnectedLayer::getFilters()
+{
+    std::cout << "\nConnectedLayer::getFilters: can't be used.\n" << std::endl;
+    exit(0);
+}
+
 size_t ConnectedLayer::getKernelRow()
 {
-    std::cout << "\nConnectedLayer::getKernelRow can't be used.\n" << std::endl;
+    std::cout << "\nConnectedLayer::getKernelRow: can't be used.\n" << std::endl;
     exit(0);
 }
 
 size_t ConnectedLayer::getKernelCol()
 {
-    std::cout << "\nConnectedLayer::getKernelCol can't be used.\n" << std::endl;
-    exit(0);
-}
-
-size_t ConnectedLayer::getChannel()
-{
-    std::cout << "\nConnectedLayer::getChannel can't be used.\n" << std::endl;
+    std::cout << "\nConnectedLayer::getKernelCol: can't be used.\n" << std::endl;
     exit(0);
 }
 

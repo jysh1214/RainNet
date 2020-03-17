@@ -51,18 +51,18 @@ void Net::createRandomWeight()
                 weight->data[j] = (float(rand()%200)/100) - 1;
             }
         }
-        if (layerType == "ConvolutionalLayer"){
-            // weight size: row * col * ((output channel) * (input channel))
-            // size_t a = (this->layers[i])->getKernelRow();
-            // size_t b = (this->layers[i])->getKernelCol();
-            // size_t c = (this->layers[i]->prev)->getChannel();
-            // size_t d = (this->layers[i])->getChannel();
+        else if (layerType == "ConvolutionalLayer"){
+            // weight size: row * col * ((input channel) * filters)
+            size_t a = (this->layers[i])->getKernelRow();
+            size_t b = (this->layers[i])->getKernelCol();
+            size_t c = (this->layers[i]->prev)->getOutput()->channel;
+            size_t d = (this->layers[i])->getFilters();
 
-            // size_t e = a*b*c*d;
-            // weight = (float*) new float[e];
-            // for (size_t j=0; j<e; ++j){
-            //     weight[j] = (float(rand()%200)/100) - 1;
-            // }
+            weight = new tensor(a, b, c*d);
+            for (size_t j=0; j<(a*b*c*d); ++j){
+                weight->data[j] = (float(rand()%200)/100) - 1;
+            }
+            
         }
 
         (this->layers[i])->setWeight(weight);
@@ -77,6 +77,11 @@ void Net::createRandomWeight()
 void Net::init()
 {
     createLayerList(this->layers);
+
+    // input layer: input = output
+    (this->layers[0])->setInput(this->input);
+    (this->layers[0])->setOutput(this->input);
+
     if (!loadweight){
         this->createRandomWeight();
     }
@@ -84,9 +89,6 @@ void Net::init()
         // TODO: load weight
     }
 
-    // input layer: input = output
-    (this->layers[0])->setInput(this->input);
-    (this->layers[0])->setOutput(this->input);
 }
 
 /**
@@ -102,8 +104,8 @@ void Net::predict(tensor* input)
 
 void Net::train(tensor* input, size_t epoch)
 {
-    assert(this->LossFunction && "\nNet::train ERROR: Loss function is not setted.\n");
-    assert(this->learningRate && "\nNet::train ERROR: Learning rate is not setted.\n");
+    assert(this->LossFunction && "Net::train ERROR: Loss function is not setted.");
+    assert(this->learningRate && "Net::train ERROR: Learning rate is not setted.");
 
     this->LossFunction = getLossFunction(this->lossFunction);
 

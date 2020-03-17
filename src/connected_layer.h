@@ -5,7 +5,7 @@
 #include "layer.h"
 #include "activation_fumction.h"
 #include "loss_function.h"
-#include "matrix_operator.h"
+#include "tensor_operator.h"
 #include "print.h"
 
 #include <assert.h>
@@ -25,9 +25,9 @@ public:
     void setIndex(size_t i);
     size_t getIndex();
     size_t getSize();
+    size_t getFilters();   // banned
     size_t getKernelRow(); // banned
     size_t getKernelCol(); // banned
-    size_t getChannel();   // banned
     
     void setInput(tensor* input);
     tensor* getInput();

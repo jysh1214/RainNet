@@ -1,9 +1,12 @@
 #ifndef MATRIX_OPERATOR_H
 #define MATRIX_OPERATOR_H
 
+#include "print.h"
+
 #include <assert.h>
 #include <stdlib.h>
 #include <iostream>
+
 /**
  * Row - major
  * 
@@ -34,6 +37,9 @@ struct tensor
         this->col = col;
         this->channel = channel;
         data = (float*) new float[row * col * channel];
+        for (size_t i=0; i<(row*col*channel); ++i){
+            data[i] = 0.0;
+        }
     }
     virtual ~tensor()
     {
@@ -52,7 +58,7 @@ struct tensor
 */
 static tensor* matrixMultiplication(tensor* a, tensor* b)
 {
-    assert((a->col == b->row) && "matrixMultiplication ERROR: matrix size not match.");
+    assert((a->col == b->row && a->channel == 1 && b->channel == 1) && "matrixMultiplication ERROR: matrix size not match.");
     tensor* c = new tensor(a->row, b->col, 1);
     
     #pragma omp parallel for
@@ -67,6 +73,46 @@ static tensor* matrixMultiplication(tensor* a, tensor* b)
     }
 
     return c;
+}
+
+/***/
+static tensor* paddingZero(tensor* m, size_t padding)
+{
+    tensor* n = new tensor(m->row+2*padding, m->col+2*padding, m->channel);
+
+    for (size_t k=0; k<m->channel; ++k){
+        for (size_t i=0; i<m->row; ++i){
+            for (size_t j=0; j<m->col; ++j){
+                n->data[k*(n->row)*(n->col) + (i+padding)*(n->col) + j+padding] = m->data[k*(m->row)*(m->col) + i*(m->col) + j];
+            }
+        }
+    }
+
+    print(m->data, m->row, m->col, m->channel);
+    print(n->data, n->row, n->col, n->channel);
+
+    return n;
+}
+
+/**
+ * convolution - output = conv(input, kernel)
+ * @return output
+ * 
+ * NOTE: 
+ * output_row = (input_row - kernel_row + 2*padding)/stride + 1
+ * output_col = (input_col - kernel_col + 2*padding)/stride + 1
+*/
+static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t stride)
+{
+    assert(input && kernel);
+    assert(!(kernel->channel % input->channel));
+
+    size_t outputRow = (input->row - kernel->row + 2*padding)/stride + 1;
+    size_t outputCol = (input->col - kernel->col + 2*padding)/stride + 1;
+    size_t outputChannel = (kernel->channel)/(input->channel);
+
+    tensor* output = new tensor(outputRow, outputCol, outputChannel);
+    tensor* matrix = paddingZero(input, padding);
 }
 
 #endif
