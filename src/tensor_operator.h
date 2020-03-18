@@ -8,25 +8,6 @@
 #include <iostream>
 
 /**
- * Row - major
- * 
- * matrix: 1 x N => matrix[N]
- * for (int i=0; i<N; ++i)
- *     matrix[i];
- * 
- * matrix: N x M => matrix[N * M]
- * for (int i=0; i<N; ++i)
- *     for (int j=0; j<M; ++j)
- *         matrix[i*M + j];
- * 
- * matrix: N x M x C => matrix[N * M * C]
- * for (int i=0; i<N; ++i)
- *     for (int j=0; j<M; ++j)
- *         for (int k=0; k<C; ++k)
- *             matrix[i*M*C + j*C + k];
-*/
-
-/**
  * NOTE: matrix(row, col) = tensor(row, col, 1)
 */
 struct tensor
@@ -75,7 +56,6 @@ static tensor* matrixMultiplication(tensor* a, tensor* b)
     return c;
 }
 
-/***/
 static tensor* paddingZero(tensor* m, size_t padding)
 {
     tensor* n = new tensor(m->row+2*padding, m->col+2*padding, m->channel);
@@ -87,9 +67,6 @@ static tensor* paddingZero(tensor* m, size_t padding)
             }
         }
     }
-
-    print(m->data, m->row, m->col, m->channel);
-    print(n->data, n->row, n->col, n->channel);
 
     return n;
 }
@@ -120,17 +97,22 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
         matrix = input;
     }
 
+    #pragma omp parallel for
     for (size_t k=0; k<outputChannel; ++k){
         for (size_t i=0; i<outputRow; ++i){
             for (size_t j=0; j<outputCol; ++j){
 
                 float result = 0.0;
+                for (size_t kc=(k*input->channel); kc<(k+1)*input->channel; ++kc){ 
                     for (size_t kr=0; kr<kernel->row; ++kr){
                         for (size_t kl=0; kl<kernel->col; ++kl){
-                            result += kernel->data[k*(kernel->row)*(kernel->col) + kr*(kernel->col) + kl] * 
-                            matrix->data[k*(kernel->row)*(kernel->col) + (kr+i)*(kernel->col) + (kl+j)];
+                            #pragma omp atomic
+                            result += kernel->data[kc*(kernel->row)*(kernel->col) + kr*(kernel->col) + kl] * 
+                            matrix->data[(kc%input->channel)*(kernel->row)*(kernel->col) + (kr+i)*(kernel->col) + (kl+j)];
+                            // std::cout<< "kernel: "<<kc<<"; input: "<<kc%input->channel<<std::endl;
                         }
                     }
+                }
                 output->data[k*(outputRow)*(outputCol) + i*(outputCol) + j] = result;
                 result = 0.0;
             }
@@ -138,8 +120,6 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
     }
 
     if (matrix != input) delete matrix;
-
-    print(output->data, output->row, output->col, output->channel);
 
     return output;
 }
