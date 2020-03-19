@@ -9,6 +9,6 @@
 #include "../src/net.h"
 #include "../src/print.h"
 #include "../src/softmax.h"
-#include "../src/tensor_operator.h"
+#include "../src/tensor.h"
 
 #endif

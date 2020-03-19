@@ -37,7 +37,7 @@ void ConnectedLayer::forward(Net* net)
             // count error
             net->error = net->LossFunction(net->target, this->output);
             // net->error = (net->target[0] - this->output[0]) * ActivationGradient(this->output[0]);
-            net->error *= ActivationGradient(net->error);
+            // net->error *= ActivationGradient(net->error);
             std::cout << "error: " << net->error << std::endl;
             // update weight
             this->update(net);
@@ -47,7 +47,7 @@ void ConnectedLayer::forward(Net* net)
             // count error
             // net->error = (net->target[0] - this->output[0]) * ActivationGradient(this->output[0]);
             net->error = net->LossFunction(net->target, this->output);
-            net->error *= ActivationGradient(net->error);
+            // net->error *= ActivationGradient(net->error);
             std::cout << "error: " << net->error << std::endl;
         }
     }
@@ -70,7 +70,7 @@ void ConnectedLayer::update(Net* net)
     for (size_t i=0; i<row; ++i){
         tensor* prevOutput = (this->prev)->getOutput();
         for (size_t j=0; j<col; ++j){
-            (this->weight)->data[i*col + j] += (net->error * prevOutput->data[i]) * net->learningRate;
+            (this->weight)->data[i*col + j] += (net->error * ActivationGradient(net->error) * prevOutput->data[i]) * net->learningRate;
         }
     }
 }
@@ -135,10 +135,7 @@ tensor* ConnectedLayer::getWeight()
 
 void ConnectedLayer::printWeight()
 {
-    size_t row = (this->prev)->getSize();
-    size_t col = this->size;
-
-    // print(this->weight, row, col);
+    print((this->weight)->data, (this->weight)->row, (this->weight)->col, (this->weight)->channel);
 }
 
 void ConnectedLayer::setOutput(tensor* output)
@@ -153,9 +150,6 @@ tensor* ConnectedLayer::getOutput()
 
 void ConnectedLayer::printOutput()
 {
-    size_t row = 1;
-    size_t col = this->size;
-
-    // print(this->output, row, col);
+    print((this->output)->data, (this->output)->row, (this->output)->col, (this->output)->channel);
 }
 

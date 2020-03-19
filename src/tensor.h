@@ -1,5 +1,5 @@
-#ifndef MATRIX_OPERATOR_H
-#define MATRIX_OPERATOR_H
+#ifndef TENSOR_H
+#define TENSOR_H
 
 #include "print.h"
 
@@ -14,6 +14,7 @@ struct tensor
 {
     tensor(size_t row, size_t col, size_t channel)
     {
+        assert(row != 0 && col != 0 && channel != 0);
         this->row = row;
         this->col = col;
         this->channel = channel;
@@ -32,6 +33,67 @@ struct tensor
     size_t channel;
     float* data;
 };
+
+/**
+ * flip all matrix in the tensor
+*/
+static tensor* flip(tensor* a)
+{
+    assert(a);
+    tensor* b = new tensor(a->row, a->col, a->channel);
+
+    for (size_t k=0; k<a->channel; ++k){
+        for (size_t i=0; i<a->row; ++i){
+            for (size_t j=0; j<a->col; ++j){
+                b->data[k*(a->row)*(a->col) + i*(a->col) + j] = 
+                a->data[k*(a->row)*(a->col) + (a->row - i)*(a->col) + (a->col - j)];
+            }
+        }
+    }
+
+    return b;
+}
+
+/**
+ * all elements in tensor a times b
+*/
+static tensor* dot(tensor*a, float b)
+{
+    assert(a);
+    tensor* c = new tensor(a->row, a->col, a->channel);
+
+    for (size_t k=0; k<a->channel; ++k){
+        for (size_t i=0; i<a->row; ++i){
+            for (size_t j=0; j<a->col; ++j){
+                c->data[k*(a->row)*(a->col) + i*(a->col) + j] = 
+                a->data[k*(a->row)*(a->col) + i*(a->col) + j] * b;
+            }
+        }
+    }
+
+    return c;
+}
+
+static tensor* tensor2matrix(tensor* a, size_t channel)
+{
+    assert(a);
+    tensor* matrix = new tensor((a->row)*(a->col)*(a->channel/channel), channel, 1);
+
+    size_t t = 0;
+    for (size_t k=0; k<a->channel; ++k){
+        for (size_t i=0; i<a->row; ++i){
+            for (size_t j=0; j<a->col; ++j){
+                matrix->data[t + (k*(a->row)*(a->col)+i*(a->col)+j)/matrix->row] = 
+                a->data[k*(a->row)*(a->col) + i*(a->col) + j];
+                t += channel;
+                if (((k*(a->row)*(a->col)+i*(a->col)+j)+1)%matrix->row == 0) t = 0;
+                
+            }
+        }
+    }
+
+    return matrix;
+}
 
 /**
  * matrixMultiplication - matrix a * matrix b = matrix c

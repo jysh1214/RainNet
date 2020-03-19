@@ -1,8 +1,9 @@
 #ifndef LOSS_FUNCTION_H
 #define LOSS_FUNCTION_H
 
-#include "tensor_operator.h"
+#include "tensor.h"
 
+#include <assert.h>
 #include <cmath>
 #include <string>
 #include <iostream>
@@ -12,6 +13,8 @@ typedef float(*LossFunction)(tensor*, tensor*);
 // L1: sum(abs(target - predict)) / n
 static inline float L1(tensor* target, tensor* predict)
 {
+    assert(target && predict);
+
     float loss = 0.0;
     size_t a = target->row;
     size_t b = target->col;
@@ -27,6 +30,8 @@ static inline float L1(tensor* target, tensor* predict)
 // L2: sum((target - predict)^2) / 2n
 static inline float L2(tensor* target, tensor* predict)
 {
+    assert(target && predict);
+
     float loss = 0.0;
     size_t a = target->row;
     size_t b = target->col;
@@ -42,6 +47,8 @@ static inline float L2(tensor* target, tensor* predict)
 // cross entropy: sum(target*log(predict) + (1-target)*log(1-predict))/(-n)
 static inline float crossEntropy(tensor* target, tensor* predict)
 {
+    assert(target && predict);
+    
     float loss = 0.0;
     size_t a = target->row;
     size_t b = target->col;

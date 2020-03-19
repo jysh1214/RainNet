@@ -10,8 +10,8 @@ tensor* target = new tensor(1, 1, 1);
 int main()
 {
     Net network;
-    network.learningRate = 1.0;
-    network.lossFunction = "L1";
+    network.learningRate = 0.5;
+    network.lossFunction = "L2";
     network.layers.push_back(layer_0);
     network.layers.push_back(layer_1);
     network.layers.push_back(layer_2);
@@ -24,7 +24,7 @@ int main()
 
     size_t epoch = 10;
     network.train(input, epoch);
-    // network.predict(input);
+    network.predict(input);
 
     return 0;
 }

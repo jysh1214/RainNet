@@ -1,7 +1,7 @@
 #ifndef LAYER_H
 #define LAYER_H
 
-#include "tensor_operator.h"
+#include "tensor.h"
 
 #include <stdlib.h>
 #include <string>
@@ -18,7 +18,6 @@ struct Layer
     virtual void update(Net* net) = 0;
 
     virtual std::string getType() = 0;
-
     virtual void setIndex(size_t i) = 0;
     virtual size_t getIndex() = 0;
 

@@ -1,7 +1,7 @@
 #ifndef ACTIVATION_FUNCTION_H
 #define ACTIVATION_FUNCTION_H
 
-#include "tensor_operator.h"
+#include "tensor.h"
 
 #include <cmath>
 #include <string>
@@ -102,7 +102,7 @@ static ActivationGradient getActivationGradient(std::string activation)
         return reluGradient;
     }
     else if (activation == "leaky"){
-        return leaky;  
+        return leakyGradient;  
     }
     else if (activation == "tanh"){
         return tanhGradient;

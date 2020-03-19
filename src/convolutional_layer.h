@@ -4,7 +4,7 @@
 #include "net.h"
 #include "layer.h"
 #include "activation_fumction.h"
-#include "tensor_operator.h"
+#include "tensor.h"
 #include "print.h"
 
 struct ConvolutionalLayer: public Layer

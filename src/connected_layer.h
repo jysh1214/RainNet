@@ -5,7 +5,7 @@
 #include "layer.h"
 #include "activation_fumction.h"
 #include "loss_function.h"
-#include "tensor_operator.h"
+#include "tensor.h"
 #include "print.h"
 
 #include <assert.h>

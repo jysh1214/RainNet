@@ -30,9 +30,9 @@ void ConvolutionalLayer::forward(Net* net)
     
     if (t_output) this->output = t_output;
     if (ActivationFunction){
-        size_t a = 1;
-        size_t b = 2;
-        size_t c = 3;
+        size_t a = (this->output)->row;
+        size_t b = (this->output)->col;
+        size_t c = (this->output)->channel;
         for (size_t i=0; i<(a*b*c); ++i){
             (this->output)->data[i] = ActivationFunction((this->output)->data[i]);
         }
@@ -42,10 +42,17 @@ void ConvolutionalLayer::forward(Net* net)
     if (!this->next){
         if (net->training){
             // count error
+            net->error = net->LossFunction(net->target, this->output);
+            std::cout << "error: " << net->error << std::endl;
             // update weight
+            this->update(net);
+            (this->prev)->backward(net);
+
         }
         if (!net->training){
             // count error
+            net->error = net->LossFunction(net->target, this->output);
+            std::cout << "error: " << net->error << std::endl;
         }
     }
 }
@@ -60,7 +67,35 @@ void ConvolutionalLayer::backward(Net* net)
 
 void ConvolutionalLayer::update(Net* net)
 {
-    std::cout << "fuck" << std::endl;
+    assert(net->error && "ConvolutionalLayer::update ERROR: The error missing.");
+    
+    print((this->prev->getOutput())->data, (this->prev->getOutput())->row, (this->prev->getOutput())->col, (this->prev->getOutput())->channel);
+    print((this->weight)->data, (this->weight)->row, (this->weight)->col, (this->weight)->channel);
+
+    // tensor* prevOut = (this->prev)->getOutput();
+    // tensor* flipTensor = flip(prevOut);
+    // tensor* flipWeight = flip(this->weight);
+
+    // tensor* n_flipWeight = dot(flipWeight, net->error);
+
+    // tensor* decay = convolution(flipTensor, n_flipWeight, this->padding, this->stride);
+    // tensor* n_decay = dot(decay, ActivationGradient(net->error));
+
+    // print(n_decay->data, n_decay->row, n_decay->col, n_decay->channel);
+
+    tensor* fuck = tensor2matrix(this->weight, this->filters);
+    print(fuck->data, fuck->row, fuck->col, fuck->channel);
+
+    // size_t z = 0; // weight channel
+    // for (size_t x=0; x<(this->weight->channel)/(prevOut->channel); ++x){
+    //     for (size_t y=0; y<prevOut->channel; ++y){ // input channel
+    //         std::cout << x << ", " << y << ", " << z << std::endl;
+
+            
+
+    //         z++;
+    //     }
+    // }
 }
 
 std::string ConvolutionalLayer::getType()
@@ -121,7 +156,7 @@ tensor* ConvolutionalLayer::getWeight()
 
 void ConvolutionalLayer::printWeight()
 {
-
+    print((this->weight)->data, (this->weight)->row, (this->weight)->col, (this->weight)->channel);
 }
 
 void ConvolutionalLayer::setOutput(tensor* output)
@@ -136,5 +171,5 @@ tensor* ConvolutionalLayer::getOutput()
 
 void ConvolutionalLayer::printOutput()
 {
-
+    print((this->output)->data, (this->output)->row, (this->output)->col, (this->output)->channel);
 }

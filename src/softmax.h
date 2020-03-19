@@ -1,7 +1,7 @@
 #ifndef SOFTMAX_H
 #define SIFTMAX_H
 
-#include "tensor_operator.h"
+#include "tensor.h"
 
 #include <cmath>
 
