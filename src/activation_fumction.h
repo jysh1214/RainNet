@@ -33,9 +33,6 @@ static inline float sigmoidGradient(float x)
 }
 
 // ReLu
-/**
- * may let net dead sometimes
-*/
 static inline float relu(float x)
 {
     return (x * (x > 0));
@@ -85,9 +82,10 @@ static ActivationFunction getActivationFunction(std::string activation)
     else if (activation == "tanh"){
         return tanh;
     }
-    
-    std::cout << "\ngetActivationFunction ERROR: No such activation function.\n" << std::endl;
-    return 0;
+    else {
+        std::cout << "\ngetActivationFunction ERROR: No such activation function.\n" << std::endl;
+        return 0;
+    }
 }
 
 static ActivationGradient getActivationGradient(std::string activation)
@@ -107,9 +105,10 @@ static ActivationGradient getActivationGradient(std::string activation)
     else if (activation == "tanh"){
         return tanhGradient;
     }
-
-    std::cout << "\ngetActivationGradient ERROR: No such activation function.\n" << std::endl;
-    return 0;
+    else {
+        std::cout << "\ngetActivationGradient ERROR: No such activation function.\n" << std::endl;
+        return 0;
+    }
 }
 
 #endif

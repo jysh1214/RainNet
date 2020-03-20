@@ -66,9 +66,9 @@ void ConnectedLayer::update(Net* net)
     assert(net->error && "ConnectedLayer::update ERROR: The error missing.");
     size_t row = (this->prev)->getSize();
     size_t col = this->size;
-
+    tensor* prevOutput = (this->prev)->getOutput();
+    
     for (size_t i=0; i<row; ++i){
-        tensor* prevOutput = (this->prev)->getOutput();
         for (size_t j=0; j<col; ++j){
             (this->weight)->data[i*col + j] += (net->error * ActivationGradient(net->error) * prevOutput->data[i]) * net->learningRate;
         }
