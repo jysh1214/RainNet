@@ -74,50 +74,6 @@ static tensor* dot(tensor*a, float b)
     return c;
 }
 
-static tensor* tensor2matrix(tensor* a, size_t channel)
-{
-    assert(a);
-    tensor* matrix = new tensor((a->row)*(a->col)*(a->channel/channel), channel, 1);
-
-    size_t t = 0;
-    for (size_t k=0; k<a->channel; ++k){
-        for (size_t i=0; i<a->row; ++i){
-            for (size_t j=0; j<a->col; ++j){
-                matrix->data[t + (k*(a->row)*(a->col)+i*(a->col)+j)/matrix->row] = 
-                a->data[k*(a->row)*(a->col) + i*(a->col) + j];
-                t += channel;
-                if (((k*(a->row)*(a->col)+i*(a->col)+j)+1)%matrix->row == 0) t = 0;
-                
-            }
-        }
-    }
-
-    return matrix;
-}
-
-/**
- * matrixMultiplication - matrix a * matrix b = matrix c
- * @return c
-*/
-static tensor* matrixMultiplication(tensor* a, tensor* b)
-{
-    assert((a->col == b->row && a->channel == 1 && b->channel == 1) && "matrixMultiplication ERROR: matrix size not match.");
-    tensor* c = new tensor(a->row, b->col, 1);
-    
-    #pragma omp parallel for
-    for (size_t i=0; i<(a->row); ++i){
-        for (size_t j=0; j<(b->col); ++j){
-            c->data[i*(b->col) + j] = 0;
-            for (size_t k=0; k<(a->col); ++k){
-                #pragma omp atomic
-                c->data[i*(a->col) + j] += a->data[i*(a->col) + k] * b->data[k*(a->col) + j];
-            }
-        }
-    }
-
-    return c;
-}
-
 static tensor* paddingZero(tensor* m, size_t padding)
 {
     tensor* n = new tensor(m->row+2*padding, m->col+2*padding, m->channel);
@@ -131,6 +87,122 @@ static tensor* paddingZero(tensor* m, size_t padding)
     }
 
     return n;
+}
+
+/**
+ * EX:
+ * channel1
+ * [[1, 2]] => [1, 5]
+ * [[3, 4]]    [2, 6]
+ * channel2    [3, 7]
+ * [[5, 6]]    [4, 8]
+ * [[7, 8]]           
+*/
+static tensor* tensor2matrix(tensor* a, size_t channel)
+{
+    assert(a);
+    tensor* matrix = new tensor((a->row)*(a->col)*(a->channel/channel), channel, 1);
+
+    size_t t = 0;
+    for (size_t k=0; k<a->channel; ++k){
+        for (size_t i=0; i<a->row; ++i){
+            for (size_t j=0; j<a->col; ++j){
+                matrix->data[t + (k*(a->row)*(a->col)+i*(a->col)+j)/matrix->row] = 
+                a->data[k*(a->row)*(a->col) + i*(a->col) + j];
+                t += channel;
+                if (((k*(a->row)*(a->col)+i*(a->col)+j)+1)%matrix->row == 0) t = 0;
+            }
+        }
+    }
+
+    return matrix;
+}
+
+/***/
+static tensor* tensor2matrix(tensor* a, size_t row, size_t col, size_t padding, size_t stride)
+{
+    assert(a);
+    size_t outputRow = (a->row - row + 2*padding)/stride + 1;
+    size_t outputCol = (a->col - col + 2*padding)/stride + 1;
+    tensor* b = new tensor((outputRow)*(outputCol), (row)*(col)*(a->channel), 1);
+
+    size_t bSize = (b->row)*(b->col);
+    size_t bPosition = 0;
+
+    tensor* m_a = paddingZero(a, padding);
+
+    for (size_t i=0; i<m_a->row; ++i){
+        for (size_t j=0; j<m_a->col; ++j){
+            
+            for (size_t k=0; k<m_a->channel; ++k){
+                for (size_t x=0; x<row; ++x){
+                    for (size_t y=0; y<col; ++y){
+                        // std::cout << k*(m_a->row)*(m_a->col) + (x+i)*(m_a->col) + (y+j) << std::endl;
+                        b->data[bPosition] = 
+                        m_a->data[k*(m_a->row)*(m_a->col) + (x+i)*(m_a->col) + (y+j)];
+                        ++bPosition;
+                        if (bPosition == bSize-1) goto DONE;
+                    }
+                }
+            }
+
+        }
+    }
+    
+    DONE:
+    return b;
+}
+
+/**
+ * EX:
+ * [1, 5]    channel1
+ * [2, 6] => [[1, 2]]
+ * [3, 7]    [[3, 4]]
+ * [4, 8]    channel2
+ *           [[5, 6]]
+ *           [[7, 8]]
+*/
+static tensor* matrix2tensor(tensor* a, size_t row, size_t col)
+{
+    assert(a && a->channel == 1);
+    assert(a->row%(row*col) == 0);
+    tensor* b = new tensor(row, col, (a->col)*(a->row/(row*col)));
+
+    size_t channel = a->col;
+    size_t t = 0;
+    for (size_t k=0; k<b->channel; ++k){
+        for (size_t i=0; i<b->row; ++i){
+            for (size_t j=0; j<b->col; ++j){
+                b->data[k*(b->row)*(b->col) + i*(b->col) + j] = 
+                a->data[t + (k*(b->row)*(b->col)+i*(b->col)+j)/a->row];
+                t += channel;
+                if (((k*(b->row)*(b->col)+i*(b->col)+j)+1)%a->row == 0) t = 0;
+            }
+        }
+    }
+
+    return b;
+}
+
+/**
+ * matrixMultiplication - matrix a * matrix b = matrix c
+ * @return c
+*/
+static tensor* matrixMultiplication(tensor* a, tensor* b)
+{
+    assert((a->col == b->row && a->channel == 1 && b->channel == 1) && "matrixMultiplication ERROR: matrix size not match.");
+    tensor* c = new tensor(a->row, b->col, 1);
+    
+    for (size_t i=0; i<(a->row); ++i){
+        for (size_t j=0; j<(b->col); ++j){
+            c->data[i*(b->col) + j] = 0;
+            for (size_t k=0; k<(a->col); ++k){
+                c->data[i*(b->col) + j] += a->data[i*(a->col) + k] * b->data[k*(a->col) + j];
+            }
+        }
+    }
+
+    return c;
 }
 
 /**
@@ -150,7 +222,7 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
     size_t outputCol = (input->col - kernel->col + 2*padding)/stride + 1;
     size_t outputChannel = (kernel->channel)/(input->channel);
 
-    tensor* output = new tensor(outputRow, outputCol, outputChannel);
+    // tensor* output = new tensor(outputRow, outputCol, outputChannel);
     tensor* matrix = paddingZero(input, padding);
 
     if (kernel->row == 1 && kernel->col == 1){
@@ -159,27 +231,33 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
         matrix = input;
     }
 
-    #pragma omp parallel for
-    for (size_t k=0; k<outputChannel; ++k){
-        for (size_t i=0; i<outputRow; ++i){
-            for (size_t j=0; j<outputCol; ++j){
+    tensor* x = tensor2matrix(input, kernel->row, kernel->col, padding, stride);
+    tensor* w = tensor2matrix(kernel, outputChannel);
+    tensor* y = matrixMultiplication(x, w);
+    tensor* output = matrix2tensor(y, outputRow, outputCol);
+    // print(output->data, output->row, output->col, output->channel);
 
-                float result = 0.0;
-                for (size_t kc=(k*input->channel); kc<(k+1)*input->channel; ++kc){ 
-                    for (size_t kr=0; kr<kernel->row; ++kr){
-                        for (size_t kl=0; kl<kernel->col; ++kl){
-                            #pragma omp atomic
-                            result += kernel->data[kc*(kernel->row)*(kernel->col) + kr*(kernel->col) + kl] * 
-                            matrix->data[(kc%input->channel)*(kernel->row)*(kernel->col) + (kr+i)*(kernel->col) + (kl+j)];
-                            // std::cout<< "kernel: "<<kc<<"; input: "<<kc%input->channel<<std::endl;
-                        }
-                    }
-                }
-                output->data[k*(outputRow)*(outputCol) + i*(outputCol) + j] = result;
-                result = 0.0;
-            }
-        }
-    }
+    // #pragma omp parallel for
+    // for (size_t k=0; k<outputChannel; ++k){
+    //     for (size_t i=0; i<outputRow; ++i){
+    //         for (size_t j=0; j<outputCol; ++j){
+
+    //             float result = 0.0;
+    //             for (size_t kc=(k*input->channel); kc<(k+1)*input->channel; ++kc){ 
+    //                 for (size_t kr=0; kr<kernel->row; ++kr){
+    //                     for (size_t kl=0; kl<kernel->col; ++kl){
+    //                         #pragma omp atomic
+    //                         result += kernel->data[kc*(kernel->row)*(kernel->col) + kr*(kernel->col) + kl] * 
+    //                         matrix->data[(kc%input->channel)*(kernel->row)*(kernel->col) + (kr+i)*(kernel->col) + (kl+j)];
+    //                         // std::cout<< "kernel: "<<kc<<"; input: "<<kc%input->channel<<std::endl;
+    //                     }
+    //                 }
+    //             }
+    //             output->data[k*(outputRow)*(outputCol) + i*(outputCol) + j] = result;
+    //             result = 0.0;
+    //         }
+    //     }
+    // }
 
     if (matrix != input) delete matrix;
 

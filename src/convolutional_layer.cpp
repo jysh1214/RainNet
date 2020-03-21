@@ -68,34 +68,24 @@ void ConvolutionalLayer::backward(Net* net)
 void ConvolutionalLayer::update(Net* net)
 {
     assert(net->error && "ConvolutionalLayer::update ERROR: The error missing.");
-    
-    print((this->prev->getOutput())->data, (this->prev->getOutput())->row, (this->prev->getOutput())->col, (this->prev->getOutput())->channel);
-    print((this->weight)->data, (this->weight)->row, (this->weight)->col, (this->weight)->channel);
 
-    // tensor* prevOut = (this->prev)->getOutput();
-    // tensor* flipTensor = flip(prevOut);
-    // tensor* flipWeight = flip(this->weight);
+    tensor* weightMatrix = tensor2matrix(this->weight, this->filters);
+    size_t row = weightMatrix->row;
+    size_t col = weightMatrix->col;
 
-    // tensor* n_flipWeight = dot(flipWeight, net->error);
+    tensor* prevOutput = (this->prev)->getOutput();
+    tensor* prevMatrix = tensor2matrix(prevOutput, this->kernelRow, this->kernelCol, this->padding, this->stride);
 
-    // tensor* decay = convolution(flipTensor, n_flipWeight, this->padding, this->stride);
-    // tensor* n_decay = dot(decay, ActivationGradient(net->error));
+    for (size_t i=0; i<row; ++i){
+        for (size_t j=0; j<col; ++j){
+            weightMatrix->data[i*col + j] += (net->error * ActivationGradient(net->error) * prevMatrix->data[i]) * net->learningRate;
+        }
+    }
 
-    // print(n_decay->data, n_decay->row, n_decay->col, n_decay->channel);
+    tensor* newWeight = matrix2tensor(weightMatrix, this->kernelRow, this->kernelCol);
 
-    tensor* fuck = tensor2matrix(this->weight, this->filters);
-    print(fuck->data, fuck->row, fuck->col, fuck->channel);
-
-    // size_t z = 0; // weight channel
-    // for (size_t x=0; x<(this->weight->channel)/(prevOut->channel); ++x){
-    //     for (size_t y=0; y<prevOut->channel; ++y){ // input channel
-    //         std::cout << x << ", " << y << ", " << z << std::endl;
-
-            
-
-    //         z++;
-    //     }
-    // }
+    this->weight = nullptr;
+    this->weight = newWeight;
 }
 
 std::string ConvolutionalLayer::getType()

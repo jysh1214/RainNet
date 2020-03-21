@@ -36,8 +36,6 @@ void ConnectedLayer::forward(Net* net)
         if (net->training){
             // count error
             net->error = net->LossFunction(net->target, this->output);
-            // net->error = (net->target[0] - this->output[0]) * ActivationGradient(this->output[0]);
-            // net->error *= ActivationGradient(net->error);
             std::cout << "error: " << net->error << std::endl;
             // update weight
             this->update(net);
@@ -45,9 +43,7 @@ void ConnectedLayer::forward(Net* net)
         }
         if (!net->training){
             // count error
-            // net->error = (net->target[0] - this->output[0]) * ActivationGradient(this->output[0]);
             net->error = net->LossFunction(net->target, this->output);
-            // net->error *= ActivationGradient(net->error);
             std::cout << "error: " << net->error << std::endl;
         }
     }

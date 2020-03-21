@@ -9,13 +9,13 @@ tensor* target = new tensor(5, 5, 2);
 int main()
 {
     Net network;
-    network.learningRate = 0.1;
-    network.lossFunction = "L1";
+    network.learningRate = 0.01;
+    network.lossFunction = "L2";
     network.layers.push_back(layer_0);
     network.layers.push_back(layer_1);
 
     for (size_t i=0; i<(5*5*3); ++i){
-        input->data[i] = 1;
+        input->data[i] = i;
     }
 
     for (size_t i=0; i<(5*5*2); ++i){
@@ -24,9 +24,9 @@ int main()
 
     network.target = target;
 
-    size_t epoch = 1;
+    size_t epoch = 10;
     network.train(input, epoch);
-
+    network.predict(input);
 
     return 0;
 }
