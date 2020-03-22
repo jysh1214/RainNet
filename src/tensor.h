@@ -81,7 +81,8 @@ static tensor* paddingZero(tensor* m, size_t padding)
     for (size_t k=0; k<m->channel; ++k){
         for (size_t i=0; i<m->row; ++i){
             for (size_t j=0; j<m->col; ++j){
-                n->data[k*(n->row)*(n->col) + (i+padding)*(n->col) + j+padding] = m->data[k*(m->row)*(m->col) + i*(m->col) + j];
+                n->data[k*(n->row)*(n->col) + (i+padding)*(n->col) + j+padding] = 
+                m->data[k*(m->row)*(m->col) + i*(m->col) + j];
             }
         }
     }
@@ -222,19 +223,25 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
     size_t outputCol = (input->col - kernel->col + 2*padding)/stride + 1;
     size_t outputChannel = (kernel->channel)/(input->channel);
 
-    // tensor* output = new tensor(outputRow, outputCol, outputChannel);
-    tensor* matrix = paddingZero(input, padding);
+    tensor* output;
 
     if (kernel->row == 1 && kernel->col == 1){
-        outputRow = input->row;
-        outputCol = input->col;
-        matrix = input;
+        output = new tensor(input->row, input->col, input->channel);
+        for (size_t k=0; k<input->channel; ++k){
+            for (size_t i=0; i<input->row; ++i){
+                for (size_t j=0; j<input->col; ++j){
+                    input->data[k*(input->row)*(input->col) + i*(input->col) + j] *= kernel->data[0];
+                }
+            }
+        }
+
+        return output;
     }
 
     tensor* x = tensor2matrix(input, kernel->row, kernel->col, padding, stride);
     tensor* w = tensor2matrix(kernel, outputChannel);
     tensor* y = matrixMultiplication(x, w);
-    tensor* output = matrix2tensor(y, outputRow, outputCol);
+    output = matrix2tensor(y, outputRow, outputCol);
     // print(output->data, output->row, output->col, output->channel);
 
     // #pragma omp parallel for
@@ -258,8 +265,6 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
     //         }
     //     }
     // }
-
-    if (matrix != input) delete matrix;
 
     return output;
 }

@@ -10,7 +10,6 @@
 typedef float(*ActivationFunction)(float);
 typedef float(*ActivationGradient)(float);
 
-// linear
 static inline float linear(float x)
 {
     return x;
@@ -21,7 +20,6 @@ static inline float linearGradient(float x)
     return 1;
 }
 
-// sigmoid
 static inline float sigmoid(float x)
 {
     return (exp(x)) / (exp(x) + 1);
@@ -32,7 +30,6 @@ static inline float sigmoidGradient(float x)
     return (x * (1 - x));
 }
 
-// ReLu
 static inline float relu(float x)
 {
     return (x * (x > 0));
@@ -43,7 +40,6 @@ static inline float reluGradient(float x)
     return (x > 0);
 }
 
-// leaky ReLu
 static inline float leaky(float x)
 {
     return (x>0)? x: (0.1*x);
@@ -54,7 +50,6 @@ static inline float leakyGradient(float x)
     return (x>0)? 1: 0.1;
 }
 
-// tanh
 static inline float tanh(float x)
 {
     return (exp(2*x) - 1)/(exp(2*x) + 1);

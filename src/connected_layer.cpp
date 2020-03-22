@@ -66,7 +66,8 @@ void ConnectedLayer::update(Net* net)
     
     for (size_t i=0; i<row; ++i){
         for (size_t j=0; j<col; ++j){
-            (this->weight)->data[i*col + j] += (net->error * ActivationGradient(net->error) * prevOutput->data[i]) * net->learningRate;
+            (this->weight)->data[i*col + j] += 
+            (net->error * ActivationGradient(net->error) * prevOutput->data[i]) * net->learningRate;
         }
     }
 }
