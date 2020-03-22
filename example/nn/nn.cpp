@@ -2,7 +2,8 @@
 
 Layer* layer_0 = new ConnectedLayer(2, "leaky");
 Layer* layer_1 = new ConnectedLayer(2, "leaky");
-Layer* layer_2 = new ConnectedLayer(1, "leaky");
+Layer* layer_2 = new ConnectedLayer(2, "leaky");
+Layer* layer_3 = new ConnectedLayer(1, "tanh");
 
 tensor* input = new tensor(1, 2, 1); // input: [a_1, a_2, ...]
 tensor* target = new tensor(1, 1, 1);
@@ -15,6 +16,7 @@ int main()
     network.layers.push_back(layer_0);
     network.layers.push_back(layer_1);
     network.layers.push_back(layer_2);
+    network.layers.push_back(layer_3);
 
     input->data[0] = 0.35;
     input->data[1] = 0.9;

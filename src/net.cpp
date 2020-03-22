@@ -55,7 +55,7 @@ void Net::createRandomWeight()
             // weight size: row * col * ((input channel) * filters)
             size_t a = (this->layers[i])->getKernelRow();
             size_t b = (this->layers[i])->getKernelCol();
-            size_t c = (this->layers[i]->prev)->getOutput()->channel;
+            size_t c = (this->layers[i]->prev)->getFilters();
             size_t d = (this->layers[i])->getFilters();
 
             weight = new tensor(a, b, c*d);

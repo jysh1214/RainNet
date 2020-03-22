@@ -78,7 +78,9 @@ void ConvolutionalLayer::update(Net* net)
 
     for (size_t i=0; i<row; ++i){
         for (size_t j=0; j<col; ++j){
-            weightMatrix->data[i*col + j] += (net->error * ActivationGradient(net->error) * prevMatrix->data[i]) * net->learningRate;
+            for (size_t k=0; k<prevMatrix->row; ++k){
+                weightMatrix->data[i*col + j] += (net->error * ActivationGradient(net->error) * prevMatrix->data[k*row + j]) * net->learningRate;
+            }
         }
     }
 
