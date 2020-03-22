@@ -1,6 +1,6 @@
 #include "convolutional_layer.h"
 
-ConvolutionalLayer::ConvolutionalLayer(size_t filters, size_t row, size_t col, size_t padding, size_t stride, std::string activation)
+ConvolutionalLayer::ConvolutionalLayer(size_t row, size_t col, size_t filters, size_t padding, size_t stride, std::string activation)
 {
     this->ActivationFunction = getActivationFunction(activation);
     this->ActivationGradient = getActivationGradient(activation);
@@ -22,12 +22,11 @@ ConvolutionalLayer::~ConvolutionalLayer()
 void ConvolutionalLayer::forward(Net* net)
 {
     assert(this->weight && "ConvolutionalLayer::forward ERROR: The weight missing.");
-
+    
     tensor* t_output;
     if (this->prev){
         t_output = convolution((this->prev)->getOutput(), this->weight, this->padding, this->stride);
     }
-    
     if (t_output) this->output = t_output;
     if (ActivationFunction){
         size_t a = (this->output)->row;
@@ -40,6 +39,11 @@ void ConvolutionalLayer::forward(Net* net)
 
     if (this->next) (this->next)->forward(net);
     if (!this->next){
+
+        assert(net->target->row == this->output->row);
+        assert(net->target->col == this->output->col);
+        assert(net->target->channel == this->output->channel);
+
         if (net->training){
             // count error
             net->error = net->LossFunction(net->target, this->output);

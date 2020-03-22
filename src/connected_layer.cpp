@@ -33,6 +33,11 @@ void ConnectedLayer::forward(Net* net)
 
     if (this->next) (this->next)->forward(net);
     if (!this->next){
+
+        assert(net->target->row == this->output->row);
+        assert(net->target->col == this->output->col);
+        assert(net->target->channel == this->output->channel);
+
         if (net->training){
             // count error
             net->error = net->LossFunction(net->target, this->output);

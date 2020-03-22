@@ -132,8 +132,8 @@ static tensor* tensor2matrix(tensor* a, size_t row, size_t col, size_t padding, 
 
     tensor* m_a = paddingZero(a, padding);
 
-    for (size_t i=0; i<m_a->row; ++i){
-        for (size_t j=0; j<m_a->col; ++j){
+    for (size_t i=0; i<m_a->row; i+=padding){
+        for (size_t j=0; j<m_a->col; j+=padding){
             
             for (size_t k=0; k<m_a->channel; ++k){
                 for (size_t x=0; x<row; ++x){
@@ -194,11 +194,14 @@ static tensor* matrixMultiplication(tensor* a, tensor* b)
     assert((a->col == b->row && a->channel == 1 && b->channel == 1) && "matrixMultiplication ERROR: matrix size not match.");
     tensor* c = new tensor(a->row, b->col, 1);
     
+    
+    #pragma omp parallel for
     for (size_t i=0; i<(a->row); ++i){
         for (size_t j=0; j<(b->col); ++j){
             c->data[i*(b->col) + j] = 0;
             for (size_t k=0; k<(a->col); ++k){
-                c->data[i*(b->col) + j] += a->data[i*(a->col) + k] * b->data[k*(a->col) + j];
+                #pragma omp atomic
+                c->data[i*(b->col) + j] += a->data[i*(a->col) + k] * b->data[k*(b->col) + j];
             }
         }
     }
@@ -237,11 +240,12 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
 
         return output;
     }
-
+    
     tensor* x = tensor2matrix(input, kernel->row, kernel->col, padding, stride);
     tensor* w = tensor2matrix(kernel, outputChannel);
-    tensor* y = matrixMultiplication(x, w);
+    tensor* y = matrixMultiplication(x, w); /// error
     output = matrix2tensor(y, outputRow, outputCol);
+
     // print(output->data, output->row, output->col, output->channel);
 
     // #pragma omp parallel for

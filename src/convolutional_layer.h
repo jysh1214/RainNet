@@ -10,7 +10,7 @@
 struct ConvolutionalLayer: public Layer
 {
 public:
-    ConvolutionalLayer(size_t filters, size_t row, size_t col, size_t padding, size_t stride, std::string activation);
+    ConvolutionalLayer(size_t row, size_t col, size_t filters, size_t padding, size_t stride, std::string activation);
     virtual ~ConvolutionalLayer();
 
     void forward(Net* net);

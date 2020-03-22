@@ -5,7 +5,7 @@ OBJ=obj
 EXAMPLE=example
 CXXFLAG=-fopenmp -Wno-unused-result -Wno-unused-function -Isrc/ -Iinclude/
 
-all: dirs $(EXAMPLE)/conv/conv $(EXAMPLE)/nn/nn 
+all: dirs $(EXAMPLE)/conv/conv $(EXAMPLE)/nn/nn $(EXAMPLE)/encoder/encoder
 
 # conv
 $(EXAMPLE)/conv/conv: $(EXAMPLE)/conv/conv.cpp\
@@ -17,6 +17,14 @@ $(OBJ)/net.o
 
 # nn
 $(EXAMPLE)/nn/nn: $(EXAMPLE)/nn/nn.cpp\
+$(OBJ)/connected_layer.o\
+$(OBJ)/convolutional_layer.o\
+$(OBJ)/dataset.o\
+$(OBJ)/net.o
+	g++ -Wall $^ -o $@ $(CXXFLAG)
+
+# encoder
+$(EXAMPLE)/encoder/encoder: $(EXAMPLE)/encoder/encoder.cpp\
 $(OBJ)/connected_layer.o\
 $(OBJ)/convolutional_layer.o\
 $(OBJ)/dataset.o\
@@ -39,7 +47,7 @@ dirs:
 	mkdir -p $(SRC) $(OBJ)
 
 clean:
-	rm -rf $(OBJ) $(EXAMPLE)/conv/conv $(EXAMPLE)/nn/nn .vscode
+	rm -rf $(OBJ) $(EXAMPLE)/conv/conv $(EXAMPLE)/nn/nn $(EXAMPLE)/encoder/encoder .vscode
 
 state:
 	wc src/*

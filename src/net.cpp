@@ -6,6 +6,7 @@
 */
 void createLayerList(std::vector<Layer*>& vec)
 {
+    assert(vec.size() != 0 && "createLayerList ERROR: Add the layer first.");
     for (size_t i=0; i<vec.size(); ++i){
         vec[i]->setIndex(i);
         if (i!=0 && i!=vec.size()-1){
