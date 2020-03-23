@@ -84,13 +84,14 @@ void ConvolutionalLayer::update(Net* net)
         for (size_t j=0; j<col; ++j){
             for (size_t k=0; k<prevMatrix->row; ++k){
                 weightMatrix->data[i*col + j] += 
-                (net->error * ActivationGradient(net->error) * prevMatrix->data[k*row + j]) * net->learningRate;
+                (net->error * ActivationGradient(net->error) * prevMatrix->data[k*(prevMatrix->col) + i]) * net->learningRate;
             }
         }
     }
 
     tensor* newWeight = matrix2tensor(weightMatrix, this->kernelRow, this->kernelCol);
 
+    delete this->weight;
     this->weight = nullptr;
     this->weight = newWeight;
 }
