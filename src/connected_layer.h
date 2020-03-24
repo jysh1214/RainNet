@@ -34,9 +34,15 @@ public:
     void setWeight(tensor* weight);
     tensor* getWeight();
     void printWeight();
+    void setBias(tensor* bias);
+    tensor* getBias();
+    void printBias();
     void setOutput(tensor* output);
     tensor* getOutput();
     void printOutput();
+    void setError(tensor* error);
+    tensor* getError();
+    void printError();
 
 private:
     float(*ActivationFunction)(float);
@@ -47,7 +53,9 @@ private:
 
     tensor* input;
     tensor* weight;
+    tensor* bias;
     tensor* output;
+    tensor* error;
 };
 
 #endif

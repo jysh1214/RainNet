@@ -16,6 +16,7 @@ struct Net
 {
     void init();
     void createRandomWeight();
+    void createRandomBias();
     void predict(tensor* input);
     void train(tensor* input, size_t epoch);
 

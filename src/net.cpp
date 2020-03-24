@@ -39,7 +39,7 @@ void Net::createRandomWeight()
 {
     srand(time(NULL));
 
-    for (size_t i=1; i<this->layers.size(); ++i){
+    for (size_t i=1; i<this->layers.size(); i++){
         std::string layerType = (this->layers[i])->getType();
         tensor* weight;
 
@@ -48,7 +48,7 @@ void Net::createRandomWeight()
             size_t b = (this->layers[i])->getSize();
 
             weight = new tensor(a, b, 1);
-            for (size_t j=0; j<a*b; ++j){
+            for (size_t j=0; j<a*b; j++){
                 weight->data[j] = (float(rand()%200)/100) - 1;
             }
         }
@@ -60,13 +60,44 @@ void Net::createRandomWeight()
             size_t d = (this->layers[i])->getFilters();
 
             weight = new tensor(a, b, c*d);
-            for (size_t j=0; j<(a*b*c*d); ++j){
+            for (size_t j=0; j<(a*b*c*d); j++){
                 weight->data[j] = (float(rand()%200)/100) - 1;
             }
             
         }
 
         (this->layers[i])->setWeight(weight);
+    }
+}
+
+/**
+ * createRandomBias - create bias between [0, 1] randomly
+ * 
+ * for:
+ * 1. connected layer
+ * 2. convolutional layer
+ * 
+ * NOTE: first layer size equal to input data
+*/
+void Net::createRandomBias()
+{
+    srand(time(NULL));
+
+    for (size_t i=1; i<this->layers.size(); i++){
+        std::string layerType = (this->layers[i])->getType();
+        tensor* bais;
+
+        if (layerType == "ConnectedLayer"){
+            size_t a = (this->layers[i])->getSize();
+            bais = new tensor(1, a, 1);
+            for (size_t j=0; j<a; j++){
+                bais->data[j] = (float(rand()%100)/100);
+            }
+        }
+        else if (layerType == "ConvolutionalLayer"){
+        }
+
+        (this->layers[i])->setBias(bais);
     }
 }
 
@@ -85,6 +116,7 @@ void Net::init()
 
     if (!loadweight){
         this->createRandomWeight();
+        this->createRandomBias();
     }
     if (loadweight){
         // TODO: load weight

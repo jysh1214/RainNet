@@ -22,12 +22,12 @@ static inline float linearGradient(float x)
 
 static inline float sigmoid(float x)
 {
-    return (exp(x)) / (exp(x) + 1);
+    return 1.0 / (1.0 + exp(-x));
 }
 
 static inline float sigmoidGradient(float x)
 { 
-    return (x * (1 - x));
+    return sigmoid(x) * (1-sigmoid(x));
 }
 
 static inline float relu(float x)

@@ -1,11 +1,11 @@
 #include "RainNet.h"
 
-Layer* layer_0 = new ConnectedLayer(2, "leaky");
-Layer* layer_1 = new ConnectedLayer(2, "leaky");
-Layer* layer_2 = new ConnectedLayer(1, "tanh");
+static Layer* layer_0 = new ConnectedLayer(2, "leaky");
+static Layer* layer_1 = new ConnectedLayer(2, "leaky");
+static Layer* layer_2 = new ConnectedLayer(1, "tanh");
 
-tensor* input = new tensor(1, 2, 1); // input: [a_1, a_2, ...]
-tensor* target = new tensor(1, 1, 1);
+static tensor* input = new tensor(1, 2, 1); // input: [a_1, a_2, ...]
+static tensor* target = new tensor(1, 1, 1);
 
 int main()
 {

@@ -273,4 +273,17 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
     return output;
 }
 
+static tensor* tensorInFunction(tensor* a, float (*func)(float))
+{
+    size_t x = a->row;
+    size_t y = a->col;
+    size_t z = a->channel;
+    tensor* b = new tensor(x, y, z);
+
+    for (size_t i=0; i<(x*y*z); i++)
+        b->data[i] = func(a->data[i]);
+
+    return b;
+}
+
 #endif

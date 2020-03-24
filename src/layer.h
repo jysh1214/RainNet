@@ -13,6 +13,12 @@ struct Layer
     Layer* next;
     Layer* prev;
 
+    /**
+     * output of layer_l: Z(l) = W(l)a(l-1) + b(l), and
+     * a(l) = activation(Z(l))
+     * 
+     * output = input * weight + bias
+    */
     virtual void forward(Net* net) = 0;
     virtual void backward(Net* net) = 0;
     virtual void update(Net* net) = 0;
@@ -36,9 +42,15 @@ struct Layer
     virtual void setWeight(tensor* weight) = 0;
     virtual tensor* getWeight() = 0;
     virtual void printWeight() = 0;
+    virtual void setBias(tensor* bias) = 0;
+    virtual tensor* getBias() = 0;
+    virtual void printBias() = 0;
     virtual void setOutput(tensor* output) = 0;
     virtual tensor* getOutput() = 0;
     virtual void printOutput() = 0;
+    virtual void setError(tensor* error) = 0;
+    virtual tensor* getError() = 0;
+    virtual void printError() = 0;
 };
 
 #endif
