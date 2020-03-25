@@ -34,6 +34,23 @@ struct tensor
     float* data;
 };
 
+static tensor* matrixAdd(tensor*a , tensor* b)
+{
+    assert(a->row == b->row);
+    assert(a->col == b->col);
+    assert(a->channel == b->channel);
+
+    for (size_t k=0; k<a->channel; ++k){
+        for (size_t i=0; i<a->row; ++i){
+            for (size_t j=0; j<a->col; ++j){
+                a->data[k*(a->row)*(a->col) + i*(a->col) + j] += b->data[k*(a->row)*(a->col) + i*(a->col) + j];
+            }
+        }
+    }
+
+    return a;
+}
+
 /**
  * flip all matrix in the tensor
 */
@@ -178,6 +195,24 @@ static tensor* matrix2tensor(tensor* a, size_t row, size_t col)
                 a->data[t + (k*(b->row)*(b->col)+i*(b->col)+j)/a->row];
                 t += channel;
                 if (((k*(b->row)*(b->col)+i*(b->col)+j)+1)%a->row == 0) t = 0;
+            }
+        }
+    }
+
+    return b;
+}
+
+/**
+ * row-majpr order to col-major order
+*/
+static tensor* matrixTranspose(tensor* a)
+{
+    tensor* b = new tensor(a->col, a->row, a->channel);
+
+    for (size_t k=0; k<(a->channel); k++){
+        for (size_t i=0; i<(b->row); i++){
+            for (size_t j=0; j<(b->col); j++){
+                b->data[k*(b->row*b->col) + i*(b->col) + j] = a->data[k*(a->row*a->col) + i*(a->row) + j];
             }
         }
     }

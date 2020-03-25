@@ -10,7 +10,7 @@ static tensor* target = new tensor(1, 1, 1);
 int main()
 {
     Net network;
-    network.learningRate = 0.01;
+    network.learningRate = 0.1;
     network.lossFunction = "L2";
     network.layers.push_back(layer_0);
     network.layers.push_back(layer_1);

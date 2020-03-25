@@ -23,29 +23,17 @@ ConnectedLayer::~ConnectedLayer()
 
 void ConnectedLayer::forward(Net* net)
 {
-    if (this->index == 1) this->input = (this->prev)->getOutput();
-
-    // this->input = (prev->output * weight) + bias
-    this->output = matrixMultiplication((this->prev)->getOutput(), this->weight);
-    for (size_t i=0; i<(this->size); i++)
-        (this->output)->data[i] += (this->bias)->data[i];
-
+    if (this->index == 1){
+        this->input = (this->prev)->getOutput();
+    }
+    else {
+        this->input = matrixMultiplication((this->prev)->getOutput(), this->weight);
+        this->output = matrixAdd(this->input, this->bias);
+    }
+    
     if (this->next) (this->next)->forward(net);
     if (!this->next){ // last layer
-        // count error
-        for (size_t i=0; i<(this->size); i++){
-            (this->error)->data[i] = this->ActivationFunction((this->output)->data[i]) - (net->target)->data[i];
-            (this->error)->data[i] *= this->ActivationGradient((this->output)->data[i]);
-        }
-        // update weight
-        for (size_t i=0; i<(this->size); i++){
-            float sum = 0.0;
-            for (size_t j=0; j<(this->size); j++){
-                sum += ((this->error)->data[j] * (this->input)->data[j]);
-            }
-            (this->weight)->data[i] -= net->learningRate * sum;
-        }
-        // backward
+        this->backward(net);
     } 
 }
 
@@ -59,25 +47,59 @@ void ConnectedLayer::backward(Net* net)
 
 void ConnectedLayer::update(Net* net)
 {
-    // assert(net->error && "ConnectedLayer::update ERROR: The error missing.");
-
-    // if (!this->next){ // output layer
-    //     for (size_t i=0; i<(this->size); i++){
-    //         (this->error)->data[i] = net->LossFunction(net->target, this->output) * this->ActivationGradient((this->output)->data[i]);
-    //     }
-    // }
-    // else {
-    //     size_t row = (this->prev)->getSize();
-    //     size_t col = this->size;
-    //     tensor* prevOutput = (this->prev)->getOutput();
-        
-    //     for (size_t i=0; i<row; ++i){
-    //         for (size_t j=0; j<col; ++j){
-    //             (this->weight)->data[i*col + j] += 
-    //             (net->error * ActivationGradient(net->error) * prevOutput->data[i]) * net->learningRate;
-    //         }
-    //     }
-    // }
+    if (!this->next){
+        // show cost
+        float cost = 0.0;
+        for (size_t i=0; i<(this->size); i++){
+            cost = ((this->output)->data[i]-(net->target)->data[i])*((this->output)->data[i]-(net->target)->data[i]);
+            cost /= 2;
+        }
+        std::cout << "cost: " << cost << std::endl;
+        // count error
+        for (size_t i=0; i<(this->size); i++){
+            (this->error)->data[i] = this->ActivationFunction((this->output)->data[i]) - (net->target)->data[i];
+            (this->error)->data[i] *= this->ActivationGradient((this->input)->data[i]);
+        }
+        // update weight
+        for (size_t i=0; i<(this->size); i++){
+            float sum = 0.0;
+            for (size_t j=0; j<(this->size); j++){
+                sum += (this->error)->data[j] * (this->input)->data[j];
+            }
+            (this->weight)->data[i] -= net->learningRate * sum;
+        }
+        // update bias
+        for (size_t i=0; i<(this->size); i++){
+            float sum = 0.0;
+            for (size_t j=0; j<(this->size); j++){
+                sum += (this->error)->data[j];
+            }            
+            (this->bias)->data[i] -= net->learningRate * sum;
+        }
+    }
+    else{
+        // count error
+        this->error = matrixMultiplication((this->next)->getWeight(), (this->next)->getError());
+        for (size_t i=0; i<(this->size); i++){
+            (this->error)->data[i] *= this->ActivationGradient((this->input)->data[i]);
+        }
+        // update weight
+        for (size_t i=0; i<(this->size); i++){
+            float sum = 0.0;
+            for (size_t j=0; j<(this->size); j++){
+                sum += (this->error)->data[j] * (this->input)->data[j];
+            }
+            (this->weight)->data[i] -= net->learningRate * sum;
+        }
+        // update bias
+        for (size_t i=0; i<(this->size); i++){
+            float sum = 0.0;
+            for (size_t j=0; j<(this->size); j++){
+                sum += (this->error)->data[j];
+            }            
+            (this->bias)->data[i] -= net->learningRate * sum;
+        }
+    }
 }
 
 std::string ConnectedLayer::getType()
