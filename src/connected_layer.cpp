@@ -24,10 +24,10 @@ ConnectedLayer::~ConnectedLayer()
 void ConnectedLayer::forward(Net* net)
 {
     if (this->index == 1){
-        this->input = (this->prev)->getOutput();
+        this->input = (this->prev)->output;
     }
     else {
-        this->input = matrixMultiplication((this->prev)->getOutput(), this->weight);
+        this->input = matrixMultiplication((this->prev)->output, this->weight);
         this->output = matrixAdd(this->input, this->bias);
     }
     
@@ -73,13 +73,13 @@ void ConnectedLayer::update(Net* net)
             float sum = 0.0;
             for (size_t j=0; j<(this->size); j++){
                 sum += (this->error)->data[j];
-            }            
+            }
             (this->bias)->data[i] -= net->learningRate * sum;
         }
     }
     else{
         // count error
-        this->error = matrixMultiplication((this->next)->getWeight(), (this->next)->getError());
+        this->error = matrixMultiplication((this->next)->weight, (this->next)->error);
         for (size_t i=0; i<(this->size); i++){
             (this->error)->data[i] *= this->ActivationGradient((this->input)->data[i]);
         }
@@ -100,21 +100,6 @@ void ConnectedLayer::update(Net* net)
             (this->bias)->data[i] -= net->learningRate * sum;
         }
     }
-}
-
-std::string ConnectedLayer::getType()
-{
-    return this->type;
-}
-
-void ConnectedLayer::setIndex(size_t i)
-{
-    this->index = i;
-}
-
-size_t ConnectedLayer::getIndex()
-{
-    return this->index;
 }
 
 size_t ConnectedLayer::getSize()
@@ -138,74 +123,4 @@ size_t ConnectedLayer::getKernelCol()
 {
     std::cout << "\nConnectedLayer::getKernelCol: can't be used.\n" << std::endl;
     exit(0);
-}
-
-void ConnectedLayer::setInput(tensor* input)
-{
-    this->input = input;
-}
-
-tensor* ConnectedLayer::getInput()
-{
-    return this->input;
-}
-
-void ConnectedLayer::setWeight(tensor* weight)
-{
-    this->weight = weight;
-}
-
-tensor* ConnectedLayer::getWeight()
-{
-    return this->weight;
-}
-
-void ConnectedLayer::printWeight()
-{
-    print((this->weight)->data, (this->weight)->row, (this->weight)->col, (this->weight)->channel);
-}
-
-void ConnectedLayer::setBias(tensor* bias)
-{
-    this->bias = bias;
-}
-
-tensor* ConnectedLayer::getBias()
-{
-    return this->bias;
-}
-
-void ConnectedLayer::printBias()
-{
-    print((this->bias)->data, (this->bias)->row, (this->bias)->col, (this->bias)->channel);
-}
-
-void ConnectedLayer::setOutput(tensor* output)
-{
-    this->output = output;
-}
-
-tensor* ConnectedLayer::getOutput()
-{
-    return this->output;
-}
-
-void ConnectedLayer::printOutput()
-{
-    print((this->output)->data, (this->output)->row, (this->output)->col, (this->output)->channel);
-}
-
-void ConnectedLayer::setError(tensor* error)
-{
-    this->error = error;
-}
-
-tensor* ConnectedLayer::getError()
-{
-    return this->error;
-}
-
-void ConnectedLayer::printError()
-{
-    print((this->error)->data, (this->error)->row, (this->error)->col, (this->error)->channel);
 }

@@ -8,7 +8,7 @@ void createLayerList(std::vector<Layer*>& vec)
 {
     assert(vec.size() != 0 && "createLayerList ERROR: Add the layer first.");
     for (size_t i=0; i<vec.size(); ++i){
-        vec[i]->setIndex(i);
+        vec[i]->index = i;
         if (i!=0 && i!=vec.size()-1){
             vec[i]->next = vec[i+1];
             vec[i]->prev = vec[i-1];
@@ -40,7 +40,7 @@ void Net::createRandomWeight()
     srand(time(NULL));
 
     for (size_t i=1; i<this->layers.size(); i++){
-        std::string layerType = (this->layers[i])->getType();
+        std::string layerType = (this->layers[i])->type;
         tensor* weight;
 
         if (layerType == "ConnectedLayer"){
@@ -66,7 +66,7 @@ void Net::createRandomWeight()
             
         }
 
-        (this->layers[i])->setWeight(weight);
+        (this->layers[i])->weight = weight;
     }
 }
 
@@ -84,7 +84,7 @@ void Net::createRandomBias()
     srand(time(NULL));
 
     for (size_t i=1; i<this->layers.size(); i++){
-        std::string layerType = (this->layers[i])->getType();
+        std::string layerType = (this->layers[i])->type;
         tensor* bais;
 
         if (layerType == "ConnectedLayer"){
@@ -95,9 +95,10 @@ void Net::createRandomBias()
             }
         }
         else if (layerType == "ConvolutionalLayer"){
+            // TODO
         }
 
-        (this->layers[i])->setBias(bais);
+        (this->layers[i])->bias = bais;
     }
 }
 
@@ -111,8 +112,8 @@ void Net::init()
     createLayerList(this->layers);
 
     // input layer: input = output
-    (this->layers[0])->setInput(this->input);
-    (this->layers[0])->setOutput(this->input);
+    (this->layers[0])->input = this->input;
+    (this->layers[0])->output = this->input;
 
     if (!loadweight){
         this->createRandomWeight();

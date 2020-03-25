@@ -1,6 +1,6 @@
 #include "RainNet.h"
 
-static Layer* layer_0 = new ConnectedLayer(2, "leaky");
+static Layer* layer_0 = new ConnectedLayer(2, "INPUT_DATA");
 static Layer* layer_1 = new ConnectedLayer(2, "leaky");
 static Layer* layer_2 = new ConnectedLayer(1, "tanh");
 

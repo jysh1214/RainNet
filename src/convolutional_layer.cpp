@@ -23,7 +23,7 @@ void ConvolutionalLayer::forward(Net* net)
 {
     assert(this->weight && "ConvolutionalLayer::forward ERROR: The weight missing.");
 
-    this->output = convolution((this->prev)->getOutput(), this->weight, this->padding, this->stride);
+    this->output = convolution((this->prev)->output, this->weight, this->padding, this->stride);
 
     if (ActivationFunction){
         size_t a = (this->output)->row;
@@ -74,7 +74,7 @@ void ConvolutionalLayer::update(Net* net)
     size_t row = weightMatrix->row;
     size_t col = weightMatrix->col;
 
-    tensor* prevOutput = (this->prev)->getOutput();
+    tensor* prevOutput = (this->prev)->output;
     tensor* prevMatrix = tensor2matrix(prevOutput, this->kernelRow, this->kernelCol, this->padding, this->stride);
 
     for (size_t i=0; i<row; ++i){
@@ -92,31 +92,6 @@ void ConvolutionalLayer::update(Net* net)
     delete this->weight;
     this->weight = nullptr;
     this->weight = newWeight;
-}
-
-std::string ConvolutionalLayer::getType()
-{
-    return this->type;
-}
-
-void ConvolutionalLayer::setIndex(size_t i)
-{
-    this->index = i;
-}
-
-size_t ConvolutionalLayer::getIndex()
-{
-    return this->index;
-}
-
-void ConvolutionalLayer::setInput(tensor* input)
-{
-    this->input = input;
-}
-
-tensor* ConvolutionalLayer::getInput()
-{
-    return this->input;
 }
 
 size_t ConvolutionalLayer::getSize()
@@ -138,64 +113,4 @@ size_t ConvolutionalLayer::getKernelRow()
 size_t ConvolutionalLayer::getKernelCol()
 {
     return this->kernelCol;
-}
-
-void ConvolutionalLayer::setWeight(tensor* weight)
-{
-    this->weight = weight;
-}
-
-tensor* ConvolutionalLayer::getWeight()
-{
-    return this->weight;
-}
-
-void ConvolutionalLayer::printWeight()
-{
-    print((this->weight)->data, (this->weight)->row, (this->weight)->col, (this->weight)->channel);
-}
-
-void ConvolutionalLayer::setBias(tensor* bias)
-{
-    this->bias = bias;
-}
-
-tensor* ConvolutionalLayer::getBias()
-{
-    return this->bias;
-}
-
-void ConvolutionalLayer::printBias()
-{
-    print((this->bias)->data, (this->bias)->row, (this->bias)->col, (this->bias)->channel);
-}
-
-void ConvolutionalLayer::setOutput(tensor* output)
-{
-    this->output = output;
-}
-
-tensor* ConvolutionalLayer::getOutput()
-{
-    return this->output;
-}
-
-void ConvolutionalLayer::printOutput()
-{
-    print((this->output)->data, (this->output)->row, (this->output)->col, (this->output)->channel);
-}
-
-void ConvolutionalLayer::setError(tensor* error)
-{
-    this->error = error;
-}
-
-tensor* ConvolutionalLayer::getError()
-{
-    return this->error;
-}
-
-void ConvolutionalLayer::printError()
-{
-    print((this->error)->data, (this->error)->row, (this->error)->col, (this->error)->channel);
 }

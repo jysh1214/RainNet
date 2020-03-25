@@ -77,6 +77,10 @@ static ActivationFunction getActivationFunction(std::string activation)
     else if (activation == "tanh"){
         return tanh;
     }
+    else if (activation == "INPUT_DATA"){
+        /* input data */
+        return 0;
+    }
     else {
         std::cout << "\ngetActivationFunction ERROR: No such activation function.\n" << std::endl;
         return 0;
@@ -99,6 +103,10 @@ static ActivationGradient getActivationGradient(std::string activation)
     }
     else if (activation == "tanh"){
         return tanhGradient;
+    }
+    else if (activation == "INPUT_DATA"){
+        /* input data */
+        return 0;
     }
     else {
         std::cout << "\ngetActivationGradient ERROR: No such activation function.\n" << std::endl;
