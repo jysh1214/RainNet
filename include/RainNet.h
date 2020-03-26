@@ -5,6 +5,7 @@
 #include "../src/connected_layer.h"
 #include "../src/convolutional_layer.h"
 #include "../src/dataset.h"
+#include "../src/gemm.h"
 #include "../src/layer.h"
 #include "../src/net.h"
 #include "../src/print.h"

@@ -1,6 +1,7 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
+#include "gemm.h"
 #include "print.h"
 
 #include <assert.h>
@@ -40,50 +41,13 @@ static tensor* matrixAdd(tensor*a , tensor* b)
     assert(a->col == b->col);
     assert(a->channel == b->channel);
 
-    for (size_t k=0; k<a->channel; ++k){
-        for (size_t i=0; i<a->row; ++i){
-            for (size_t j=0; j<a->col; ++j){
-                a->data[k*(a->row)*(a->col) + i*(a->col) + j] += b->data[k*(a->row)*(a->col) + i*(a->col) + j];
-            }
-        }
-    }
-
-    return a;
-}
-
-/**
- * flip all matrix in the tensor
-*/
-static tensor* flip(tensor* a)
-{
-    assert(a);
-    tensor* b = new tensor(a->row, a->col, a->channel);
-
-    for (size_t k=0; k<a->channel; ++k){
-        for (size_t i=0; i<a->row; ++i){
-            for (size_t j=0; j<a->col; ++j){
-                b->data[k*(a->row)*(a->col) + i*(a->col) + j] = 
-                a->data[k*(a->row)*(a->col) + (a->row - i)*(a->col) + (a->col - j)];
-            }
-        }
-    }
-
-    return b;
-}
-
-/**
- * all elements in tensor a times b
-*/
-static tensor* dot(tensor*a, float b)
-{
-    assert(a);
     tensor* c = new tensor(a->row, a->col, a->channel);
 
     for (size_t k=0; k<a->channel; ++k){
         for (size_t i=0; i<a->row; ++i){
             for (size_t j=0; j<a->col; ++j){
                 c->data[k*(a->row)*(a->col) + i*(a->col) + j] = 
-                a->data[k*(a->row)*(a->col) + i*(a->col) + j] * b;
+                a->data[k*(a->row)*(a->col) + i*(a->col) + j] + b->data[k*(a->row)*(a->col) + i*(a->col) + j];
             }
         }
     }
@@ -203,24 +167,6 @@ static tensor* matrix2tensor(tensor* a, size_t row, size_t col)
 }
 
 /**
- * row-majpr order to col-major order
-*/
-static tensor* matrixTranspose(tensor* a)
-{
-    tensor* b = new tensor(a->col, a->row, a->channel);
-
-    for (size_t k=0; k<(a->channel); k++){
-        for (size_t i=0; i<(b->row); i++){
-            for (size_t j=0; j<(b->col); j++){
-                b->data[k*(b->row*b->col) + i*(b->col) + j] = a->data[k*(a->row*a->col) + i*(a->row) + j];
-            }
-        }
-    }
-
-    return b;
-}
-
-/**
  * matrixMultiplication - matrix a * matrix b = matrix c
  * @return c
 */
@@ -229,17 +175,7 @@ static tensor* matrixMultiplication(tensor* a, tensor* b)
     assert((a->col == b->row && a->channel == 1 && b->channel == 1) && "matrixMultiplication ERROR: matrix size not match.");
     tensor* c = new tensor(a->row, b->col, 1);
     
-    
-    #pragma omp parallel for
-    for (size_t i=0; i<(a->row); ++i){
-        for (size_t j=0; j<(b->col); ++j){
-            c->data[i*(b->col) + j] = 0;
-            for (size_t k=0; k<(a->col); ++k){
-                #pragma omp atomic
-                c->data[i*(b->col) + j] += a->data[i*(a->col) + k] * b->data[k*(b->col) + j];
-            }
-        }
-    }
+    gemm(0, 0, a->row, b->col, a->col, 1, a->data, a->col, b->data, b->col, 1, c->data, c->col);
 
     return c;
 }
@@ -306,19 +242,6 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
     // }
 
     return output;
-}
-
-static tensor* tensorInFunction(tensor* a, float (*func)(float))
-{
-    size_t x = a->row;
-    size_t y = a->col;
-    size_t z = a->channel;
-    tensor* b = new tensor(x, y, z);
-
-    for (size_t i=0; i<(x*y*z); i++)
-        b->data[i] = func(a->data[i]);
-
-    return b;
 }
 
 #endif

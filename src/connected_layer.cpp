@@ -23,16 +23,11 @@ ConnectedLayer::~ConnectedLayer()
 
 void ConnectedLayer::forward(Net* net)
 {
-    if (this->index == 1){
-        this->input = (this->prev)->output;
-    }
-    else {
-        this->input = matrixMultiplication((this->prev)->output, this->weight);
-        this->output = matrixAdd(this->input, this->bias);
-    }
+    this->input = matrixMultiplication((this->prev)->output, this->weight);
+    this->output = matrixAdd(this->input, this->bias);
     
     if (this->next) (this->next)->forward(net);
-    if (!this->next){ // last layer
+    if (!this->next){
         this->backward(net);
     } 
 }
@@ -49,11 +44,7 @@ void ConnectedLayer::update(Net* net)
 {
     if (!this->next){
         // show cost
-        float cost = 0.0;
-        for (size_t i=0; i<(this->size); i++){
-            cost = ((this->output)->data[i]-(net->target)->data[i])*((this->output)->data[i]-(net->target)->data[i]);
-            cost /= 2;
-        }
+        float cost = net->LossFunction(net->target, this->output);
         std::cout << "cost: " << cost << std::endl;
         // count error
         for (size_t i=0; i<(this->size); i++){
@@ -100,27 +91,4 @@ void ConnectedLayer::update(Net* net)
             (this->bias)->data[i] -= net->learningRate * sum;
         }
     }
-}
-
-size_t ConnectedLayer::getSize()
-{
-    return this->size;
-}
-
-size_t ConnectedLayer::getFilters()
-{
-    std::cout << "\nConnectedLayer::getFilters: can't be used.\n" << std::endl;
-    exit(0);
-}
-
-size_t ConnectedLayer::getKernelRow()
-{
-    std::cout << "\nConnectedLayer::getKernelRow: can't be used.\n" << std::endl;
-    exit(0);
-}
-
-size_t ConnectedLayer::getKernelCol()
-{
-    std::cout << "\nConnectedLayer::getKernelCol: can't be used.\n" << std::endl;
-    exit(0);
 }

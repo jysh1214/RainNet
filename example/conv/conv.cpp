@@ -1,6 +1,6 @@
 #include "RainNet.h"
 
-static Layer* layer_0 = new ConvolutionalLayer(5, 5, 3, 0, 0, "leaky");
+static Layer* layer_0 = new ConvolutionalLayer(5, 5, 3, 0, 0, "INPUT_DATA");
 static Layer* layer_1 = new ConvolutionalLayer(3, 3, 2, 1, 1, "leaky");
 static Layer* layer_2 = new ConvolutionalLayer(3, 3, 2, 1, 1, "tanh");
 
@@ -11,7 +11,7 @@ int main()
 {
     Net network;
     network.learningRate = 0.01;
-    network.lossFunction = "L2";
+    network.lossFunction = "MSE";
     network.layers.push_back(layer_0);
     network.layers.push_back(layer_1);
     network.layers.push_back(layer_2);

@@ -6,17 +6,19 @@ ConvolutionalLayer::ConvolutionalLayer(size_t row, size_t col, size_t filters, s
     this->ActivationGradient = getActivationGradient(activation);
     this->type = "ConvolutionalLayer";
     this->filters = filters;
-    this->kernelRow = row;
-    this->kernelCol = col;
+    this->row = row;
+    this->col = col;
     this->padding = padding;
     this->stride = stride;
 }
 
 ConvolutionalLayer::~ConvolutionalLayer()
 {
-    if (input) delete input;
-    if (weight) delete weight;
-    if (output) delete output;
+    if (this->input)  delete this->input;
+    if (this->weight) delete this->weight;
+    if (this->bias)   delete this->bias;
+    if (this->output) delete this->output;
+    if (this->error)  delete this->error;
 }
 
 void ConvolutionalLayer::forward(Net* net)
@@ -75,7 +77,7 @@ void ConvolutionalLayer::update(Net* net)
     size_t col = weightMatrix->col;
 
     tensor* prevOutput = (this->prev)->output;
-    tensor* prevMatrix = tensor2matrix(prevOutput, this->kernelRow, this->kernelCol, this->padding, this->stride);
+    tensor* prevMatrix = tensor2matrix(prevOutput, this->row, this->col, this->padding, this->stride);
 
     for (size_t i=0; i<row; ++i){
         for (size_t j=0; j<col; ++j){
@@ -86,31 +88,10 @@ void ConvolutionalLayer::update(Net* net)
         }
     }
 
-    tensor* newWeight = matrix2tensor(weightMatrix, this->kernelRow, this->kernelCol);
+    tensor* newWeight = matrix2tensor(weightMatrix, this->row, this->col);
     delete weightMatrix;
 
     delete this->weight;
     this->weight = nullptr;
     this->weight = newWeight;
-}
-
-size_t ConvolutionalLayer::getSize()
-{
-    std::cout << "\nConvolutionalLayer::getSize can't be used.\n" << std::endl;
-    exit(0);
-}
-
-size_t ConvolutionalLayer::getFilters()
-{
-    return this->filters;
-}
-
-size_t ConvolutionalLayer::getKernelRow()
-{
-    return this->kernelRow;
-}
-
-size_t ConvolutionalLayer::getKernelCol()
-{
-    return this->kernelCol;
 }

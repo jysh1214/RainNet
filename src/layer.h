@@ -32,15 +32,15 @@ struct Layer
     tensor* output;
     tensor* error;
 
-    /**
-     * for connected layer:
-     * @return: the number of the neurons
-    */
-    virtual size_t getSize() = 0;
+    // for connected layer
+    size_t size;
+
     // for convolutional layer
-    virtual size_t getFilters() = 0;
-    virtual size_t getKernelRow() = 0;
-    virtual size_t getKernelCol() = 0;
+    size_t filters;
+    size_t row;
+    size_t col;
+    size_t padding;
+    size_t stride;
 };
 
 #endif

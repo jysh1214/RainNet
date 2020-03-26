@@ -21,16 +21,9 @@ public:
     void backward(Net* net);
     void update(Net* net);
 
-    size_t getSize();
-    size_t getFilters();   // banned
-    size_t getKernelRow(); // banned
-    size_t getKernelCol(); // banned
-
 private:
     float(*ActivationFunction)(float);
     float(*ActivationGradient)(float);
-
-    size_t size;
 };
 
 #endif

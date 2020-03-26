@@ -11,7 +11,7 @@ int main()
 {
     Net network;
     network.learningRate = 0.1;
-    network.lossFunction = "L2";
+    network.lossFunction = "MSE";
     network.layers.push_back(layer_0);
     network.layers.push_back(layer_1);
     network.layers.push_back(layer_2);

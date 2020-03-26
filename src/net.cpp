@@ -16,11 +16,11 @@ void createLayerList(std::vector<Layer*>& vec)
         else {
             if (i == 0){
                 vec[i]->next = vec[i+1];
-                vec[i]->prev = nullptr;                
+                vec[i]->prev = nullptr;
             }
             if (i == vec.size()-1){
                 vec[i]->next = nullptr;
-                vec[i]->prev = vec[i-1];                
+                vec[i]->prev = vec[i-1];
             }
         }
     }
@@ -44,8 +44,8 @@ void Net::createRandomWeight()
         tensor* weight;
 
         if (layerType == "ConnectedLayer"){
-            size_t a = (this->layers[i]->prev)->getSize();
-            size_t b = (this->layers[i])->getSize();
+            size_t a = (this->layers[i]->prev)->size;
+            size_t b = (this->layers[i])->size;
 
             weight = new tensor(a, b, 1);
             for (size_t j=0; j<a*b; j++){
@@ -54,15 +54,6 @@ void Net::createRandomWeight()
         }
         else if (layerType == "ConvolutionalLayer"){
             // weight size: row * col * ((input channel) * filters)
-            size_t a = (this->layers[i])->getKernelRow();
-            size_t b = (this->layers[i])->getKernelCol();
-            size_t c = (this->layers[i]->prev)->getFilters();
-            size_t d = (this->layers[i])->getFilters();
-
-            weight = new tensor(a, b, c*d);
-            for (size_t j=0; j<(a*b*c*d); j++){
-                weight->data[j] = (float(rand()%200)/100) - 1;
-            }
             
         }
 
@@ -71,7 +62,7 @@ void Net::createRandomWeight()
 }
 
 /**
- * createRandomBias - create bias between [0, 1] randomly
+ * createRandomBias - create bias between [0.01, 1.01] randomly
  * 
  * for:
  * 1. connected layer
@@ -88,10 +79,10 @@ void Net::createRandomBias()
         tensor* bais;
 
         if (layerType == "ConnectedLayer"){
-            size_t a = (this->layers[i])->getSize();
+            size_t a = (this->layers[i])->size;
             bais = new tensor(1, a, 1);
             for (size_t j=0; j<a; j++){
-                bais->data[j] = (float(rand()%100)/100);
+                bais->data[j] = (float(rand()%100)/100) + 0.01;
             }
         }
         else if (layerType == "ConvolutionalLayer"){
