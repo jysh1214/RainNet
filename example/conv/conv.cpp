@@ -1,8 +1,8 @@
 #include "RainNet.h"
 
 static Layer* layer_0 = new ConvolutionalLayer(5, 5, 3, 0, 0, "INPUT_DATA");
-static Layer* layer_1 = new ConvolutionalLayer(3, 3, 2, 1, 1, "leaky");
-static Layer* layer_2 = new ConvolutionalLayer(3, 3, 2, 1, 1, "tanh");
+static Layer* layer_1 = new ConvolutionalLayer(3, 3, 2, 1, 1, "leaky"); // 5*5*2
+static Layer* layer_2 = new ConvolutionalLayer(3, 3, 2, 1, 1, "tanh"); // 5*5
 
 static tensor* input = new tensor(5, 5, 3);
 static tensor* target = new tensor(5, 5, 2);

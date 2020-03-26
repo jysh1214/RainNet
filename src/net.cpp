@@ -48,14 +48,26 @@ void Net::createRandomWeight()
             size_t b = (this->layers[i])->size;
 
             weight = new tensor(a, b, 1);
-            for (size_t j=0; j<a*b; j++){
+            for (size_t j=0; j<a*b; j++)
                 weight->data[j] = (float(rand()%200)/100) - 1;
-            }
+
         }
         else if (layerType == "ConvolutionalLayer"){
-            // weight size: row * col * ((input channel) * filters)
+            // weight size: row * col * (filters * prev->filters)
+            size_t a = this->layers[i]->row;
+            size_t b = this->layers[i]->col;
+            size_t c = this->layers[i]->filters;
+            size_t d = (this->layers[i]->prev)->filters;
             
+            weight = new tensor(a, b, c*d);
+            for (size_t j=0; j<a*b*c*d; j++)
+                weight->data[j] = (float(rand()%200)/100) - 1;
+
         }
+        else {
+            /* add new layer */
+        }
+        
 
         (this->layers[i])->weight = weight;
     }
@@ -81,12 +93,28 @@ void Net::createRandomBias()
         if (layerType == "ConnectedLayer"){
             size_t a = (this->layers[i])->size;
             bais = new tensor(1, a, 1);
-            for (size_t j=0; j<a; j++){
+            for (size_t j=0; j<a; j++)
                 bais->data[j] = (float(rand()%100)/100) + 0.01;
-            }
+            
         }
         else if (layerType == "ConvolutionalLayer"){
-            // TODO
+            size_t prevRow = (this->layers[i]->prev)->output->row;
+            size_t prevCol = (this->layers[i]->prev)->output->col;
+            size_t thisRow = (this->layers[i])->row;
+            size_t thisCol = (this->layers[i])->col;
+            size_t padding = (this->layers[i])->padding;
+            size_t stride = (this->layers[i])->stride;
+            size_t outputRow = (prevRow - thisRow + 2*padding)/stride + 1;
+            size_t outputCol = (prevCol - thisCol + 2*padding)/stride + 1;
+            size_t filters = (this->layers[i])->filters;
+            bais = new tensor(outputRow, outputCol, filters);
+            std::cout << outputRow << ", " << outputCol << ", " << filters << std::endl;
+            for (size_t j=0; j<outputRow*outputCol*filters; j++)
+                bais->data[j] = (float(rand()%100)/100) + 0.01;
+
+        }
+        else {
+            /* add new layer */
         }
 
         (this->layers[i])->bias = bais;

@@ -36,9 +36,9 @@ struct Layer
     size_t size;
 
     // for convolutional layer
-    size_t filters;
     size_t row;
     size_t col;
+    size_t filters;
     size_t padding;
     size_t stride;
 };
