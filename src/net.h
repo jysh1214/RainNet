@@ -15,20 +15,21 @@
 struct Net
 {
     void init();
+    void mallocLayerMemory();
     void createRandomWeight();
     void createRandomBias();
-    void predict(tensor* input);
-    void train(tensor* input, size_t epoch);
+    void predict(tensor *input);
+    void train(tensor *input, size_t epoch);
 
     bool training;
     float learningRate;
     float error;
     std::string lossFunction;
-    float(*LossFunction)(tensor*, tensor*);
+    float (*LossFunction)(tensor *, tensor *);
 
-    tensor* input;
-    tensor* target;
-    std::vector<Layer*> layers;
+    tensor *input;
+    tensor *target;
+    std::vector<Layer *> layers;
     bool loadweight = false;
 };
 

@@ -14,27 +14,31 @@ ConvolutionalLayer::ConvolutionalLayer(size_t row, size_t col, size_t filters, s
 
 ConvolutionalLayer::~ConvolutionalLayer()
 {
-    if (this->input)  delete this->input;
-    if (this->weight) delete this->weight;
-    if (this->bias)   delete this->bias;
-    if (this->output) delete this->output;
-    if (this->error)  delete this->error;
+    if (this->input)
+        delete this->input;
+    if (this->weight)
+        delete this->weight;
+    if (this->bias)
+        delete this->bias;
+    if (this->output)
+        delete this->output;
+    if (this->error)
+        delete this->error;
 }
 
-void ConvolutionalLayer::forward(Net* net)
+void ConvolutionalLayer::forward(Net *net)
 {
-
 }
 
-void ConvolutionalLayer::backward(Net* net)
+void ConvolutionalLayer::backward(Net *net)
 {
-    if (this->prev){
+    if (this->prev)
+    {
         this->update(net);
         (this->prev)->backward(net);
     }
 }
 
-void ConvolutionalLayer::update(Net* net)
+void ConvolutionalLayer::update(Net *net)
 {
-
 }

@@ -16,21 +16,23 @@ struct Net;
 */
 struct Layer
 {
-    Layer* next;
-    Layer* prev;
+    Layer *next;
+    Layer *prev;
 
-    virtual void forward(Net* net) = 0;
-    virtual void backward(Net* net) = 0;
-    virtual void update(Net* net) = 0;
+    virtual void forward(Net *net) = 0;
+    virtual void backward(Net *net) = 0;
+    virtual void update(Net *net) = 0;
 
+    // create in construct
     std::string type;
+    // create in creatLayerList in net.cpp
     size_t index;
 
-    tensor* input;
-    tensor* weight;
-    tensor* bias;
-    tensor* output;
-    tensor* error;
+    tensor *input;
+    tensor *weight;
+    tensor *bias;
+    tensor *output;
+    tensor *error;
 
     // for connected layer
     size_t size;

@@ -11,19 +11,19 @@
 #include <assert.h>
 #include <iostream>
 
-struct ConnectedLayer: public Layer
+struct ConnectedLayer : public Layer
 {
 public:
     ConnectedLayer(size_t size, std::string activation);
     virtual ~ConnectedLayer();
 
-    void forward(Net* net);
-    void backward(Net* net);
-    void update(Net* net);
+    void forward(Net *net);
+    void backward(Net *net);
+    void update(Net *net);
 
 private:
-    float(*ActivationFunction)(float);
-    float(*ActivationGradient)(float);
+    float (*ActivationFunction)(float);
+    float (*ActivationGradient)(float);
 };
 
 #endif

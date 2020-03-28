@@ -12,10 +12,10 @@
 
 struct Dataset
 {
-    Dataset(const char* filePath);
+    Dataset(const char *filePath);
     virtual ~Dataset();
 
-    tensor* dataTensor;
+    tensor *dataTensor;
 };
 
 #endif
