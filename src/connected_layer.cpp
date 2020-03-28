@@ -24,8 +24,10 @@ ConnectedLayer::~ConnectedLayer()
 
 void ConnectedLayer::forward(Net *net)
 {
-    this->input = matrixMultiplication((this->prev)->output, this->weight);
-    this->output = matrixAdd(this->input, this->bias);
+    this->input = matrixMul((this->prev)->output, 0, this->weight, 0);
+    this->input = matrixAdd(this->input, this->bias);
+    for (size_t i = 0; i < (this->size); i++)
+        (this->output)->data[i] = this->ActivationFunction((this->input)->data[i]);
 
     if (this->next)
         (this->next)->forward(net);
@@ -79,7 +81,7 @@ void ConnectedLayer::update(Net *net)
     else
     {
         // count error
-        this->error = matrixMultiplication((this->next)->weight, (this->next)->error);
+        this->error = matrixMul((this->next)->error, 0, (this->next)->weight, 1);
         for (size_t i = 0; i < (this->size); i++)
         {
             (this->error)->data[i] *= this->ActivationGradient((this->input)->data[i]);
@@ -88,10 +90,12 @@ void ConnectedLayer::update(Net *net)
         for (size_t i = 0; i < (this->size); i++)
         {
             float sum = 0.0;
-            for (size_t j = 0; j < (this->size); j++)
+            tensor *temp = matrixMul((this->prev)->output, 1, this->error, 0);
+            for (size_t j = 0; j < (temp->row * temp->col); j++)
             {
-                sum += (this->error)->data[j] * (this->input)->data[j];
+                sum += temp->data[j];
             }
+            delete temp;
             (this->weight)->data[i] -= net->learningRate * sum;
         }
         // update bias

@@ -44,7 +44,7 @@ void Net::mallocLayerMemory()
             size_t a = (this->layers[i]->prev)->size;
             size_t b = (this->layers[i])->size;
 
-            (this->layers[i])->input = new tensor(1, b, 1);
+            // (this->layers[i])->input = new tensor(1, b, 1);
             (this->layers[i])->weight = new tensor(a, b, 1);
             (this->layers[i])->bias = new tensor(1, b, 1);
             (this->layers[i])->output = new tensor(1, b, 1);
@@ -61,7 +61,7 @@ void Net::mallocLayerMemory()
             size_t g = (a - d + 2 * (this->layers[i]->padding)) / (this->layers[i]->stride) + 1; // output row
             size_t h = (b - e + 2 * (this->layers[i]->padding)) / (this->layers[i]->stride) + 1; // output col
 
-            (this->layers[i])->input = new tensor(a, b, c);
+            // (this->layers[i])->input = new tensor(a, b, c);
             // weight->channel = (prev->filters)*(this->filters)
             (this->layers[i])->weight = new tensor(d, e, c * f);
             (this->layers[i])->bias = new tensor(g, h, f);
@@ -125,11 +125,12 @@ void Net::createRandomBias()
 void Net::init()
 {
     createLayerList(this->layers);
-    this->mallocLayerMemory();
 
     // input layer: input = output
     (this->layers[0])->input = this->input;
     (this->layers[0])->output = this->input;
+
+    this->mallocLayerMemory();
 
     if (!loadweight)
     {

@@ -100,7 +100,9 @@ static tensor* tensor2matrix(tensor* a, size_t channel)
     return matrix;
 }
 
-/***/
+/**
+ * input tensor to matrix
+*/
 static tensor* tensor2matrix(tensor* a, size_t row, size_t col, size_t padding, size_t stride)
 {
     assert(a);
@@ -168,14 +170,17 @@ static tensor* matrix2tensor(tensor* a, size_t row, size_t col)
 
 /**
  * matrixMultiplication - matrix a * matrix b = matrix c
- * @return c
+ * @a: matrix
+ * @TA: transpose matrix a
+ * @b: matrix
+ * @TB: transpose matrix b
 */
-static tensor* matrixMultiplication(tensor* a, tensor* b)
+static tensor* matrixMul(tensor* a, int TA, tensor* b, int TB)
 {
-    assert((a->col == b->row && a->channel == 1 && b->channel == 1) && "matrixMultiplication ERROR: matrix size not match.");
+    assert(a->channel == 1 && b->channel == 1);
     tensor* c = new tensor(a->row, b->col, 1);
     
-    gemm(0, 0, a->row, b->col, a->col, 1, a->data, a->col, b->data, b->col, 1, c->data, c->col);
+    gemm(TA, TB, a->row, b->col, a->col, 1, a->data, a->col, b->data, b->col, 1, c->data, c->col);
 
     return c;
 }
@@ -214,7 +219,7 @@ static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t
     
     tensor* x = tensor2matrix(input, kernel->row, kernel->col, padding, stride);
     tensor* w = tensor2matrix(kernel, outputChannel);
-    tensor* y = matrixMultiplication(x, w); /// error
+    tensor* y = matrixMul(x,0, w,0); /// error
     output = matrix2tensor(y, outputRow, outputCol);
 
     // print(output->data, output->row, output->col, output->channel);
