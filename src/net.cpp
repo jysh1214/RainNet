@@ -61,7 +61,7 @@ void Net::mallocLayerMemory()
             size_t g = (a - d + 2 * (this->layers[i]->padding)) / (this->layers[i]->stride) + 1; // output row
             size_t h = (b - e + 2 * (this->layers[i]->padding)) / (this->layers[i]->stride) + 1; // output col
 
-            // (this->layers[i])->input = new tensor(a, b, c);
+            (this->layers[i])->input = new tensor(g, h, f);
             // weight->channel = (prev->filters)*(this->filters)
             (this->layers[i])->weight = new tensor(d, e, c * f);
             (this->layers[i])->bias = new tensor(g, h, f);
@@ -95,7 +95,7 @@ void Net::createRandomWeight()
 }
 
 /**
- * createRandomBias - create bias between [0, 1] randomly + 0.01
+ * createRandomBias - create bias between [0, 1] randomly
  * 
  * for:
  * 1. connected layer
@@ -113,7 +113,7 @@ void Net::createRandomBias()
         size_t c = (this->layers[i])->bias->channel;
 
         for (size_t j = 0; j < (a * b * c); j++)
-            (this->layers[i])->bias->data[j] = (float(rand() % 100) / 100) + 0.01;
+            (this->layers[i])->bias->data[j] = (float(rand() % 100) / 100);
     }
 }
 

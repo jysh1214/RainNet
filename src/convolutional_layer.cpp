@@ -28,27 +28,24 @@ ConvolutionalLayer::~ConvolutionalLayer()
 
 void ConvolutionalLayer::forward(Net *net)
 {
-    tensor *prevMatrix = tensor2matrix((this->prev)->output, this->row, this->col, this->padding, this->stride);
-    tensor *weightMatrix = tensor2matrix(this->weight, this->filters);
-    tensor *biasMatrix = tensor2matrix(this->bias, this->filters);
+    for (size_t i = 0; i < this->filters; i++)
+    {
+        for (size_t j = 0; j < (this->prev->output)->channel; j++)
+        {
+            tensor *temp_a = getChannelMatrix((this->prev)->output, j);
+            tensor *temp_w = getChannelMatrix(this->weight, j * (this->filters) + i);
+            tensor* conv = convolution(temp_a, temp_w, this->padding, this->stride);
+            assignChannelMatrix(this->input, conv, i);
+            delete temp_a;
+            delete temp_w;
+            delete conv;
+        }
+    }
 
-    tensor *inputMatrix = matrixMul(prevMatrix, 0, weightMatrix, 0);
-    tensor *newMatrix = matrixAdd(inputMatrix, biasMatrix);
+    this->input = matrixAdd(this->input, this->bias);
 
-    size_t outputRow = ((this->prev)->output->row - this->row + 2 * this->padding) / (this->stride) + 1;
-    size_t outputCol = ((this->prev)->output->col - this->col + 2 * this->padding) / (this->stride) + 1;
-
-    this->input = matrix2tensor(newMatrix, outputRow, outputCol);
-    // this->output = matrix2tensor(outputMatrix, outputRow, outputCol);
-
-    for (size_t i = 0; i < (outputRow * outputCol * this->filters); i++)
+    for (size_t i = 0; i < ((this->output)->row * (this->output)->col * this->filters); i++)
         (this->output)->data[i] = this->ActivationFunction((this->input)->data[i]);
-
-    delete prevMatrix;
-    delete weightMatrix;
-    delete biasMatrix;
-    delete inputMatrix;
-    delete newMatrix;
 
     if (this->next)
         (this->next)->forward(net);
@@ -61,7 +58,7 @@ void ConvolutionalLayer::backward(Net *net)
     if (this->prev)
     {
         this->update(net);
-        (this->prev)->backward(net);
+        // (this->prev)->backward(net);
     }
 }
 
@@ -82,53 +79,13 @@ void ConvolutionalLayer::update(Net *net)
             (this->error)->data[i] *= this->ActivationGradient((this->input)->data[i]);
         }
         // update weight
-        for (size_t i = 0; i < (this->row * this->col * (this->weight)->channel); i++)
+        for (size_t i = 0; i < (this->row * this->col * this->filters * (this->prev)->filters); i++)
         {
             float sum = 0.0;
             for (size_t j = 0; j < (outputRow * outputCol * this->filters); j++)
             {
                 sum += (this->error)->data[j] * (this->input)->data[j];
             }
-            // (this->weight)->data[i] -= net->learningRate * sum;
-        }
-        // update bias
-        for (size_t i = 0; i < (this->row * this->col * (this->bias)->channel); i++)
-        {
-            float sum = 0.0;
-            for (size_t j = 0; j < (outputRow * outputCol * this->filters); j++)
-            {
-                sum += (this->error)->data[j];
-            }
-            // (this->bias)->data[i] -= net->learningRate * sum;
-        }
-    }
-    else
-    {
-        // count error
-        tensor *nextWeightMatrix = tensor2matrix((this->next)->weight, (this->next)->filters);
-        tensor *nextErrorMatrix = tensor2matrix((this->next)->error, (this->next)->filters);
-        // this->error = matrixMul((this->next)->error, 0, (this->next)->weight, 1);
-        // std::cout << nextErrorMatrix->row << ", " << nextErrorMatrix->col << std::endl;
-        // std::cout << nextWeightMatrix->col << ", " << nextWeightMatrix->row << std::endl;
-        tensor *errorMatrix = matrixMul(nextErrorMatrix, 0, nextWeightMatrix, 1);
-        this->error = matrix2tensor(errorMatrix, outputRow, outputCol);
-
-        for (size_t i = 0; i < (outputRow * outputCol * this->filters); i++)
-        {
-            (this->error)->data[i] *= this->ActivationGradient((this->input)->data[i]);
-        }
-        // update weight
-        for (size_t i = 0; i < (this->row * this->col * (this->weight)->channel); i++)
-        {
-            float sum = 0.0;
-            tensor *prevOutputMatrix = tensor2matrix((this->prev)->output, (this->prev)->filters);
-            tensor *temp = matrixMul(prevOutputMatrix, 1, errorMatrix, 0);
-            for (size_t j = 0; j < (temp->row * temp->col); j++)
-            {
-                sum += temp->data[j];
-            }
-            delete prevOutputMatrix;
-            delete temp;
             (this->weight)->data[i] -= net->learningRate * sum;
         }
         // update bias
@@ -139,11 +96,11 @@ void ConvolutionalLayer::update(Net *net)
             {
                 sum += (this->error)->data[j];
             }
-            // (this->bias)->data[i] -= net->learningRate * sum;
+            (this->bias)->data[i] -= net->learningRate * sum;
         }
-
-        delete nextWeightMatrix;
-        delete nextErrorMatrix;
-        delete errorMatrix;
+    }
+    else
+    {
+        // TODO
     }
 }

@@ -19,35 +19,39 @@ struct tensor
         this->row = row;
         this->col = col;
         this->channel = channel;
-        data = (float*) new float[row * col * channel];
-        for (size_t i=0; i<(row*col*channel); ++i){
+        data = (float *)new float[row * col * channel];
+        for (size_t i = 0; i < (row * col * channel); ++i)
+        {
             data[i] = 0.0;
         }
     }
     virtual ~tensor()
     {
-        delete [] data;
+        delete[] data;
     }
-    
+
     size_t row;
     size_t col;
     size_t channel;
-    float* data;
+    float *data;
 };
 
-static tensor* matrixAdd(tensor*a , tensor* b)
+static tensor *matrixAdd(tensor *a, tensor *b)
 {
     assert(a->row == b->row);
     assert(a->col == b->col);
     assert(a->channel == b->channel);
 
-    tensor* c = new tensor(a->row, a->col, a->channel);
+    tensor *c = new tensor(a->row, a->col, a->channel);
 
-    for (size_t k=0; k<a->channel; ++k){
-        for (size_t i=0; i<a->row; ++i){
-            for (size_t j=0; j<a->col; ++j){
-                c->data[k*(a->row)*(a->col) + i*(a->col) + j] = 
-                a->data[k*(a->row)*(a->col) + i*(a->col) + j] + b->data[k*(a->row)*(a->col) + i*(a->col) + j];
+    for (size_t k = 0; k < a->channel; ++k)
+    {
+        for (size_t i = 0; i < a->row; ++i)
+        {
+            for (size_t j = 0; j < a->col; ++j)
+            {
+                c->data[k * (a->row) * (a->col) + i * (a->col) + j] =
+                    a->data[k * (a->row) * (a->col) + i * (a->col) + j] + b->data[k * (a->row) * (a->col) + i * (a->col) + j];
             }
         }
     }
@@ -55,15 +59,18 @@ static tensor* matrixAdd(tensor*a , tensor* b)
     return c;
 }
 
-static tensor* paddingZero(tensor* m, size_t padding)
+static tensor *paddingZero(tensor *m, size_t padding)
 {
-    tensor* n = new tensor(m->row+2*padding, m->col+2*padding, m->channel);
+    tensor *n = new tensor(m->row + 2 * padding, m->col + 2 * padding, m->channel);
 
-    for (size_t k=0; k<m->channel; ++k){
-        for (size_t i=0; i<m->row; ++i){
-            for (size_t j=0; j<m->col; ++j){
-                n->data[k*(n->row)*(n->col) + (i+padding)*(n->col) + j+padding] = 
-                m->data[k*(m->row)*(m->col) + i*(m->col) + j];
+    for (size_t k = 0; k < m->channel; ++k)
+    {
+        for (size_t i = 0; i < m->row; ++i)
+        {
+            for (size_t j = 0; j < m->col; ++j)
+            {
+                n->data[k * (n->row) * (n->col) + (i + padding) * (n->col) + j + padding] =
+                    m->data[k * (m->row) * (m->col) + i * (m->col) + j];
             }
         }
     }
@@ -72,27 +79,25 @@ static tensor* paddingZero(tensor* m, size_t padding)
 }
 
 /**
- * EX:
- * channel1
- * [[1, 2]] => [1, 5]
- * [[3, 4]]    [2, 6]
- * channel2    [3, 7]
- * [[5, 6]]    [4, 8]
- * [[7, 8]]           
+ * weight tensor to weight matrix       
 */
-static tensor* tensor2matrix(tensor* a, size_t channel)
+static tensor *tensor2matrix(tensor *a, size_t channel)
 {
     assert(a);
-    tensor* matrix = new tensor((a->row)*(a->col)*(a->channel/channel), channel, 1);
+    tensor *matrix = new tensor((a->row) * (a->col) * (a->channel / channel), channel, 1);
 
     size_t t = 0;
-    for (size_t k=0; k<a->channel; ++k){
-        for (size_t i=0; i<a->row; ++i){
-            for (size_t j=0; j<a->col; ++j){
-                matrix->data[t + (k*(a->row)*(a->col)+i*(a->col)+j)/matrix->row] = 
-                a->data[k*(a->row)*(a->col) + i*(a->col) + j];
+    for (size_t k = 0; k < a->channel; ++k)
+    {
+        for (size_t i = 0; i < a->row; ++i)
+        {
+            for (size_t j = 0; j < a->col; ++j)
+            {
+                matrix->data[t + (k * (a->row) * (a->col) + i * (a->col) + j) / matrix->row] =
+                    a->data[k * (a->row) * (a->col) + i * (a->col) + j];
                 t += channel;
-                if (((k*(a->row)*(a->col)+i*(a->col)+j)+1)%matrix->row == 0) t = 0;
+                if (((k * (a->row) * (a->col) + i * (a->col) + j) + 1) % matrix->row == 0)
+                    t = 0;
             }
         }
     }
@@ -101,71 +106,112 @@ static tensor* tensor2matrix(tensor* a, size_t channel)
 }
 
 /**
- * input tensor to matrix
+ * prev output tensor to matrix
 */
-static tensor* tensor2matrix(tensor* a, size_t row, size_t col, size_t padding, size_t stride)
+static tensor *tensor2matrix(tensor *a, size_t row, size_t col, size_t padding, size_t stride)
 {
     assert(a);
-    size_t outputRow = (a->row - row + 2*padding)/stride + 1;
-    size_t outputCol = (a->col - col + 2*padding)/stride + 1;
-    tensor* b = new tensor((outputRow)*(outputCol), (row)*(col)*(a->channel), 1);
+    size_t outputRow = (a->row - row + 2 * padding) / stride + 1;
+    size_t outputCol = (a->col - col + 2 * padding) / stride + 1;
+    tensor *b = new tensor((outputRow) * (outputCol), (row) * (col) * (a->channel), 1);
 
-    size_t bSize = (b->row)*(b->col);
+    size_t bSize = (b->row) * (b->col);
     size_t bPosition = 0;
 
-    tensor* m_a = paddingZero(a, padding);
+    tensor *m_a = paddingZero(a, padding);
 
-    for (size_t i=0; i<m_a->row; i+=padding){
-        for (size_t j=0; j<m_a->col; j+=padding){
-            
-            for (size_t k=0; k<m_a->channel; ++k){
-                for (size_t x=0; x<row; ++x){
-                    for (size_t y=0; y<col; ++y){
+    for (size_t i = 0; i < m_a->row; i += padding)
+    {
+        for (size_t j = 0; j < m_a->col; j += padding)
+        {
+
+            for (size_t k = 0; k < m_a->channel; ++k)
+            {
+                for (size_t x = 0; x < row; ++x)
+                {
+                    for (size_t y = 0; y < col; ++y)
+                    {
                         // std::cout << k*(m_a->row)*(m_a->col) + (x+i)*(m_a->col) + (y+j) << std::endl;
-                        b->data[bPosition] = 
-                        m_a->data[k*(m_a->row)*(m_a->col) + (x+i)*(m_a->col) + (y+j)];
+                        b->data[bPosition] =
+                            m_a->data[k * (m_a->row) * (m_a->col) + (x + i) * (m_a->col) + (y + j)];
                         ++bPosition;
-                        if (bPosition == bSize-1) goto DONE;
+                        if (bPosition == bSize - 1)
+                            goto DONE;
                     }
                 }
             }
-
         }
     }
-    
-    DONE:
+
+DONE:
     return b;
 }
 
 /**
- * EX:
- * [1, 5]    channel1
- * [2, 6] => [[1, 2]]
- * [3, 7]    [[3, 4]]
- * [4, 8]    channel2
- *           [[5, 6]]
- *           [[7, 8]]
+* input matrix to input tensor
 */
-static tensor* matrix2tensor(tensor* a, size_t row, size_t col)
+static tensor *matrix2tensor(tensor *a, size_t row, size_t col)
 {
     assert(a && a->channel == 1);
-    assert(a->row%(row*col) == 0);
-    tensor* b = new tensor(row, col, (a->col)*(a->row/(row*col)));
+    assert(a->row % (row * col) == 0);
+    tensor *b = new tensor(row, col, (a->col) * (a->row / (row * col)));
 
     size_t channel = a->col;
     size_t t = 0;
-    for (size_t k=0; k<b->channel; ++k){
-        for (size_t i=0; i<b->row; ++i){
-            for (size_t j=0; j<b->col; ++j){
-                b->data[k*(b->row)*(b->col) + i*(b->col) + j] = 
-                a->data[t + (k*(b->row)*(b->col)+i*(b->col)+j)/a->row];
+    for (size_t k = 0; k < b->channel; ++k)
+    {
+        for (size_t i = 0; i < b->row; ++i)
+        {
+            for (size_t j = 0; j < b->col; ++j)
+            {
+                b->data[k * (b->row) * (b->col) + i * (b->col) + j] =
+                    a->data[t + (k * (b->row) * (b->col) + i * (b->col) + j) / a->row];
                 t += channel;
-                if (((k*(b->row)*(b->col)+i*(b->col)+j)+1)%a->row == 0) t = 0;
+                if (((k * (b->row) * (b->col) + i * (b->col) + j) + 1) % a->row == 0)
+                    t = 0;
             }
         }
     }
 
     return b;
+}
+
+/**
+ * NOTE: i start from 0
+*/
+static tensor *getChannelMatrix(tensor *a, size_t i)
+{
+    assert(i <= a->channel);
+    tensor *output = new tensor(a->row, a->col, 1);
+    for (size_t r = 0; r < a->row; r++)
+    {
+        for (size_t c = 0; c < a->col; c++)
+        {
+            output->data[r * (a->col) + c] = a->data[i * (a->row * a->col) + r * (a->col) + c];
+        }
+    }
+
+    return output;
+}
+
+/**
+ * assign tensor a channel i = matrix
+*/
+static void assignChannelMatrix(tensor *a, tensor *matrix, size_t i)
+{
+    assert(a);
+    assert(matrix);
+    assert(i <= a->channel);
+    assert(matrix->channel == 1);
+    assert(a->row == matrix->row && a->col == matrix->col);
+
+    for (size_t r = 0; r < (a->row); r++)
+    {
+        for (size_t c = 0; c < (a->col); c++)
+        {
+            a->data[i * (a->row * a->col) + r * (a->col) + c] = matrix->data[r * (a->col) + c];
+        }
+    }
 }
 
 /**
@@ -175,11 +221,11 @@ static tensor* matrix2tensor(tensor* a, size_t row, size_t col)
  * @b: matrix
  * @TB: transpose matrix b
 */
-static tensor* matrixMul(tensor* a, int TA, tensor* b, int TB)
+static tensor *matrixMul(tensor *a, int TA, tensor *b, int TB)
 {
     assert(a->channel == 1 && b->channel == 1);
-    tensor* c = new tensor(a->row, b->col, 1);
-    
+    tensor *c = new tensor(a->row, b->col, 1);
+
     gemm(TA, TB, a->row, b->col, a->col, 1, a->data, a->col, b->data, b->col, 1, c->data, c->col);
 
     return c;
@@ -193,58 +239,42 @@ static tensor* matrixMul(tensor* a, int TA, tensor* b, int TB)
  * output_row = (input_row - kernel_row + 2*padding)/stride + 1
  * output_col = (input_col - kernel_col + 2*padding)/stride + 1
 */
-static tensor* convolution(tensor* input, tensor* kernel, size_t padding, size_t stride)
+static tensor *convolution(tensor *input, tensor *kernel, size_t padding, size_t stride)
 {
     assert(input && kernel);
-    assert(!(kernel->channel % input->channel));
+    assert(input->channel == 1 && kernel->channel == 1);
 
-    size_t outputRow = (input->row - kernel->row + 2*padding)/stride + 1;
-    size_t outputCol = (input->col - kernel->col + 2*padding)/stride + 1;
-    size_t outputChannel = (kernel->channel)/(input->channel);
+    size_t outputRow = (input->row - kernel->row + 2 * padding) / stride + 1;
+    size_t outputCol = (input->col - kernel->col + 2 * padding) / stride + 1;
+    // size_t outputChannel = (kernel->channel)/(input->channel);
 
-    tensor* output;
+    tensor *output;
 
-    if (kernel->row == 1 && kernel->col == 1){
+    if (kernel->row == 1 && kernel->col == 1)
+    {
         output = new tensor(input->row, input->col, input->channel);
-        for (size_t k=0; k<input->channel; ++k){
-            for (size_t i=0; i<input->row; ++i){
-                for (size_t j=0; j<input->col; ++j){
-                    input->data[k*(input->row)*(input->col) + i*(input->col) + j] *= kernel->data[0];
+        for (size_t k = 0; k < input->channel; ++k)
+        {
+            for (size_t i = 0; i < input->row; ++i)
+            {
+                for (size_t j = 0; j < input->col; ++j)
+                {
+                    input->data[k * (input->row) * (input->col) + i * (input->col) + j] *= kernel->data[0];
                 }
             }
         }
 
         return output;
     }
-    
-    tensor* x = tensor2matrix(input, kernel->row, kernel->col, padding, stride);
-    tensor* w = tensor2matrix(kernel, outputChannel);
-    tensor* y = matrixMul(x,0, w,0); /// error
-    output = matrix2tensor(y, outputRow, outputCol);
 
-    // print(output->data, output->row, output->col, output->channel);
+    tensor *prevOuput = tensor2matrix(input, kernel->row, kernel->col, padding, stride);
+    tensor *w = tensor2matrix(kernel, 1);
+    tensor *thisInput = matrixMul(prevOuput, 0, w, 0);
+    output = matrix2tensor(thisInput, outputRow, outputCol);
 
-    // #pragma omp parallel for
-    // for (size_t k=0; k<outputChannel; ++k){
-    //     for (size_t i=0; i<outputRow; ++i){
-    //         for (size_t j=0; j<outputCol; ++j){
-
-    //             float result = 0.0;
-    //             for (size_t kc=(k*input->channel); kc<(k+1)*input->channel; ++kc){ 
-    //                 for (size_t kr=0; kr<kernel->row; ++kr){
-    //                     for (size_t kl=0; kl<kernel->col; ++kl){
-    //                         #pragma omp atomic
-    //                         result += kernel->data[kc*(kernel->row)*(kernel->col) + kr*(kernel->col) + kl] * 
-    //                         matrix->data[(kc%input->channel)*(kernel->row)*(kernel->col) + (kr+i)*(kernel->col) + (kl+j)];
-    //                         // std::cout<< "kernel: "<<kc<<"; input: "<<kc%input->channel<<std::endl;
-    //                     }
-    //                 }
-    //             }
-    //             output->data[k*(outputRow)*(outputCol) + i*(outputCol) + j] = result;
-    //             result = 0.0;
-    //         }
-    //     }
-    // }
+    delete prevOuput;
+    delete w;
+    delete thisInput;
 
     return output;
 }
