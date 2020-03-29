@@ -24,8 +24,10 @@ ConnectedLayer::~ConnectedLayer()
 
 void ConnectedLayer::forward(Net *net)
 {
-    this->input = matrixMul((this->prev)->output, 0, this->weight, 0);
-    this->input = matrixAdd(this->input, this->bias);
+    tensor* inputMatrix = matrixMul((this->prev)->output, 0, this->weight, 0);
+    this->input = matrixAdd(inputMatrix, this->bias);
+    delete inputMatrix;
+    
     for (size_t i = 0; i < (this->size); i++)
         (this->output)->data[i] = this->ActivationFunction((this->input)->data[i]);
 

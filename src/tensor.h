@@ -124,7 +124,6 @@ static tensor *tensor2matrix(tensor *a, size_t row, size_t col, size_t padding, 
     {
         for (size_t j = 0; j < m_a->col; j += padding)
         {
-
             for (size_t k = 0; k < m_a->channel; ++k)
             {
                 for (size_t x = 0; x < row; ++x)

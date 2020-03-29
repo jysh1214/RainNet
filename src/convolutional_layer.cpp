@@ -58,7 +58,7 @@ void ConvolutionalLayer::backward(Net *net)
     if (this->prev)
     {
         this->update(net);
-        // (this->prev)->backward(net);
+        (this->prev)->backward(net);
     }
 }
 
