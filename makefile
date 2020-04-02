@@ -4,7 +4,7 @@ GPP=g++ -std=c++11 -Wall
 SRC=src
 OBJ=obj
 EXAMPLE=example
-CXXFLAG=-fopenmp -Wno-unused-result -Wno-unused-function -Isrc/ -Iinclude/
+CXXFLAG=-O3 -fopenmp -Wno-unused-result -Wno-unused-function -Isrc/ -Iinclude/
 
 all: dirs $(EXAMPLE)/conv/conv $(EXAMPLE)/nn/nn $(EXAMPLE)/encoder/encoder
 

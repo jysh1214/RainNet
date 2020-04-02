@@ -1,7 +1,7 @@
 #include "RainNet.h"
 
 static Layer* layer_0 = new ConnectedLayer(2, "INPUT_DATA");
-static Layer* layer_1 = new ConnectedLayer(3, "leaky");
+static Layer* layer_1 = new ConnectedLayer(3, "relu");
 static Layer* layer_2 = new ConnectedLayer(2, "tanh");
 
 static tensor* input = new tensor(1, 2, 1); // input: [a_1, a_2, ...]

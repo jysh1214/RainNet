@@ -79,7 +79,7 @@ static tensor *paddingZero(tensor *m, size_t padding)
 }
 
 /**
- * weight tensor to weight matrix       
+ * weight tensor to weight matrix
 */
 static tensor *tensor2matrix(tensor *a, size_t channel)
 {
@@ -233,8 +233,8 @@ static tensor *matrixMul(tensor *a, int TA, tensor *b, int TB)
 /**
  * convolution - output = conv(input, kernel)
  * @return output
- * 
- * NOTE: 
+ *
+ * NOTE:
  * output_row = (input_row - kernel_row + 2*padding)/stride + 1
  * output_col = (input_col - kernel_col + 2*padding)/stride + 1
 */

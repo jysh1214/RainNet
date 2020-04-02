@@ -30,18 +30,22 @@ void ConvolutionalLayer::forward(Net *net)
 {
     for (size_t i = 0; i < this->filters; i++)
     {
+        tensor *sum1 = new tensor((this->input)->row, (this->input)->col, 1);
+        tensor *sum2 = new tensor((this->input)->row, (this->input)->col, 1);
         for (size_t j = 0; j < (this->prev->output)->channel; j++)
         {
             tensor *temp_a = getChannelMatrix((this->prev)->output, j);
             tensor *temp_w = getChannelMatrix(this->weight, j * (this->filters) + i);
-            tensor* conv = convolution(temp_a, temp_w, this->padding, this->stride);
-            assignChannelMatrix(this->input, conv, i);
+            tensor *conv = convolution(temp_a, temp_w, this->padding, this->stride);
+            sum2 = matrixAdd(sum1, conv);
             delete temp_a;
             delete temp_w;
             delete conv;
         }
+        assignChannelMatrix(this->input, sum2, i);
+        delete sum1;
+        delete sum2;
     }
-
     this->input = matrixAdd(this->input, this->bias);
 
     for (size_t i = 0; i < ((this->output)->row * (this->output)->col * this->filters); i++)
@@ -55,7 +59,7 @@ void ConvolutionalLayer::forward(Net *net)
 
 void ConvolutionalLayer::backward(Net *net)
 {
-    if (this->prev)
+    if (this->prev && this->index > 0)
     {
         this->update(net);
         (this->prev)->backward(net);
@@ -86,6 +90,7 @@ void ConvolutionalLayer::update(Net *net)
             {
                 sum += (this->error)->data[j] * (this->input)->data[j];
             }
+            sum /= (outputRow * outputCol * this->filters);
             (this->weight)->data[i] -= net->learningRate * sum;
         }
         // update bias
@@ -96,11 +101,50 @@ void ConvolutionalLayer::update(Net *net)
             {
                 sum += (this->error)->data[j];
             }
+            sum /= (outputRow * outputCol * this->filters);
             (this->bias)->data[i] -= net->learningRate * sum;
         }
     }
     else
     {
-        // TODO
+        // count error
+        for (size_t i=0;i<this->filters; i++){
+            tensor *sum1 = new tensor((this->input)->row, (this->input)->col, 1);
+            tensor *sum2 = new tensor((this->input)->row, (this->input)->col, 1);
+            for (size_t j=0;j<(this->next)->filters;j++){
+                tensor *temp_a = getChannelMatrix((this->next)->error, j);
+                tensor *temp_w = getChannelMatrix((this->next)->weight, j + i*(this->next)->filters);
+                tensor *conv = convolution(temp_a, temp_w, this->padding, this->stride);
+                sum2 = matrixAdd(sum1, conv);
+                delete temp_a;
+                delete temp_w;
+                delete conv;
+            }
+            assignChannelMatrix(this->error, sum2, i);
+            delete sum1;
+            delete sum2;
+        }
+        // // update weight
+        // for (size_t i = 0; i < (this->row * this->col * this->filters * (this->prev)->filters); i++)
+        // {
+        //     float sum = 0.0;
+        //     for (size_t j = 0; j < (outputRow * outputCol * this->filters); j++)
+        //     {
+        //         sum += (this->error)->data[j] * (this->input)->data[j];
+        //     }
+        //     sum /= (outputRow * outputCol * this->filters);
+        //     (this->weight)->data[i] -= net->learningRate * sum;
+        // }
+        // // update bias
+        // for (size_t i = 0; i < (outputRow * outputCol * this->filters); i++)
+        // {
+        //     float sum = 0.0;
+        //     for (size_t j = 0; j < (outputRow * outputCol * this->filters); j++)
+        //     {
+        //         sum += (this->error)->data[j];
+        //     }
+        //     sum /= (outputRow * outputCol * this->filters);
+        //     (this->bias)->data[i] -= net->learningRate * sum;
+        // }
     }
 }

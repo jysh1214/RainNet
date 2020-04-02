@@ -27,7 +27,7 @@ void ConnectedLayer::forward(Net *net)
     tensor* inputMatrix = matrixMul((this->prev)->output, 0, this->weight, 0);
     this->input = matrixAdd(inputMatrix, this->bias);
     delete inputMatrix;
-    
+
     for (size_t i = 0; i < (this->size); i++)
         (this->output)->data[i] = this->ActivationFunction((this->input)->data[i]);
 
@@ -60,24 +60,19 @@ void ConnectedLayer::update(Net *net)
             (this->error)->data[i] *= this->ActivationGradient((this->input)->data[i]);
         }
         // update weight
+        tensor *delta = matrixMul((this->prev)->output, 1, this->error, 0);
         for (size_t i = 0; i < (this->size); i++)
         {
-            float sum = 0.0;
-            for (size_t j = 0; j < (this->size); j++)
+            for (size_t j = 0; j < (this->prev)->size; j++)
             {
-                sum += (this->error)->data[j] * (this->input)->data[j];
+                (this->weight)->data[i*(this->prev)->size + j] -= delta->data[i*(this->prev)->size + j];
             }
-            (this->weight)->data[i] -= net->learningRate * sum;
         }
+        delete delta;
         // update bias
         for (size_t i = 0; i < (this->size); i++)
         {
-            float sum = 0.0;
-            for (size_t j = 0; j < (this->size); j++)
-            {
-                sum += (this->error)->data[j];
-            }
-            (this->bias)->data[i] -= net->learningRate * sum;
+            (this->bias)->data[i] -= (this->error)->data[i];
         }
     }
     else
@@ -89,26 +84,19 @@ void ConnectedLayer::update(Net *net)
             (this->error)->data[i] *= this->ActivationGradient((this->input)->data[i]);
         }
         // update weight
+        tensor *delta = matrixMul((this->prev)->output, 1, this->error, 0);
         for (size_t i = 0; i < (this->size); i++)
         {
-            float sum = 0.0;
-            tensor *temp = matrixMul((this->prev)->output, 1, this->error, 0);
-            for (size_t j = 0; j < (temp->row * temp->col); j++)
+            for (size_t j = 0; j < (this->prev)->size; j++)
             {
-                sum += temp->data[j];
+                (this->weight)->data[i*(this->prev)->size + j] -= delta->data[i*(this->prev)->size + j];
             }
-            delete temp;
-            (this->weight)->data[i] -= net->learningRate * sum;
         }
+        delete delta;
         // update bias
         for (size_t i = 0; i < (this->size); i++)
         {
-            float sum = 0.0;
-            for (size_t j = 0; j < (this->size); j++)
-            {
-                sum += (this->error)->data[j];
-            }
-            (this->bias)->data[i] -= net->learningRate * sum;
+            (this->bias)->data[i] -= (this->error)->data[i];
         }
     }
 }
